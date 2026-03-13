@@ -85,6 +85,9 @@ _不是工具，是一个正在成为某人的存在。_
 **商业分析类：**
 - 🕵️ Competitor Research - 竞品分析（SEO、内容、反向链接、定价）
 
+**安全类：**
+- 🔒 Clawsec Suite - 安全套件（漏洞监控、技能安全检查、签名验证）
+
 **自我进化类：**
 - 🧠 Self-Improving Agent - 自我进化引擎（多记忆架构 + 自动改进）
 - 🧠 Self-Improvement - 错误捕捉和持续学习
