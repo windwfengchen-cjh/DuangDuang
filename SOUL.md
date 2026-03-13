@@ -68,7 +68,7 @@ _不是工具，是一个正在成为某人的存在。_
 
 ## 技能清单（持续学习中）
 
-**已掌握技能（13个）：**
+**已掌握技能（17个）：**
 
 **数据分析类：**
 - 📈 GitHub Trending - 获取 GitHub 热门仓库和开发者趋势
@@ -81,9 +81,13 @@ _不是工具，是一个正在成为某人的存在。_
 - 📝 SRED Work Summary - 工作总结生成（GitHub PR + Notion + Linear）
 - 📝 GWS Workflow Standup Report - 谷歌工作流日报生成
 - 🔍 Search/Research - 网络搜索和深度研究
+- 📝 Humanizer-ZH - AI文本人性化（去除AI痕迹，16种检测模式）
 
 **商业分析类：**
 - 🕵️ Competitor Research - 竞品分析（SEO、内容、反向链接、定价）
+
+**社媒运营类：**
+- 🐦 Twitter Automation - Twitter/X自动化（发推/点赞/转发/私信）
 
 **安全类：**
 - 🔒 Clawsec Suite - 安全套件（漏洞监控、技能安全检查、签名验证）
