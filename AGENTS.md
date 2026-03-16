@@ -310,25 +310,46 @@ Boss 说"复盘" →
 ### 【记录+转发流程】
 
 **Step 1: 转发到目标群（猛龙队开发）**
-- 消息类型：post（富文本）
-- 格式：
-```json
-{
-  "zh_cn": {
-    "title": "【产研反馈】",
-    "content": [
-      [{"tag": "text", "text": "原消息："}, {"tag": "text", "text": "[原文]"}],
-      [{"tag": "text", "text": "反馈人：@[原发言人]"}],
-      [{"tag": "at", "user_id": "ou_82e152d737ab5aedee7110066828b5a1"}, 
-       {"tag": "text", "text": " "}, 
-       {"tag": "at", "user_id": "ou_cbcd1090961b620a4500ce68e3c81952"}, 
-       {"tag": "text", "text": " 请查看~"}]
-    ]
-  }
-}
+- **消息类型：post（富文本）⚠️ 必须使用，普通文本无法高亮@**
+- **使用工具脚本发送（推荐）：**
+
+```bash
+python3 /home/admin/openclaw/workspace/send_feishu_post.py \
+  --chat-id oc_a016323a9fda4263ab5a27976065088e \
+  --title "【产研反馈】" \
+  --content "原消息：xxx" \
+  --at "ou_82e152d737ab5aedee7110066828b5a1:施嘉科" \
+  --at "ou_cbcd1090961b620a4500ce68e3c81952:宋广智"
 ```
+
+- **Python API 调用方式：**
+
+```python
+from send_feishu_post import send_post_message, build_content_paragraphs
+
+content_blocks = build_content_paragraphs(
+    content="原消息内容",
+    at_list=[
+        {"user_id": "ou_xxx", "user_name": "姓名1"},
+        {"user_id": "ou_yyy", "user_name": "姓名2"}
+    ]
+)
+
+result = send_post_message(
+    chat_id="oc_xxx",
+    title="【产研反馈】",
+    content_blocks=content_blocks
+)
+```
+
+- **关键点：**
+  - ✅ 必须使用 `msg_type: post`
+  - ✅ `at` 标签必须包含 `user_name` 字段才能正确显示名字
+  - ✅ 完整格式：`{"tag": "at", "user_id": "xxx", "user_name": "姓名"}`
+  - ❌ 不要写成 `@姓名` 纯文本，那只是文字不会高亮
+  - ❌ OpenClaw CLI 的 `--card` 参数不支持飞书 post 格式
 - @人员：施嘉科(ou_82e152d737ab5aedee7110066828b5a1)、宋广智(ou_cbcd1090961b620a4500ce68e3c81952)
-- **注意**：使用 `post` 消息类型 + `<at user_id="">` 标签实现名字高亮
+- **工具脚本位置：** `/home/admin/openclaw/workspace/send_feishu_post.py`
 
 **Step 2: 记录到飞书表格**
 - 表格链接：https://gz-junbo.feishu.cn/base/KNiibDP6KaRwopsPbRucr752ntg
