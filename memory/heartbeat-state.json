@@ -1,0 +1,15 @@
+{
+  "lastChecks": {
+    "session": "2026-03-16",
+    "config": "2026-03-15",
+    "memory": "2026-03-14",
+    "security": "2026-03-13"
+  },
+  "sessionCheck": {
+    "date": "2026-03-16",
+    "mainSession": "99k/128k (78%)",
+    "feishuGroupSession": "29k/128k (23%)",
+    "status": "warning",
+    "note": "Main session at 78%, approaching 80% threshold; recommend /compact soon; group session stable"
+  }
+}

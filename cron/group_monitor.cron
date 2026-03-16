@@ -1,0 +1,16 @@
+# 群消息轮询配置
+# 每隔 2 分钟检查一次产研-融合业务组的新消息
+
+*/2 * * * * openclaw eval "
+  const chatId = 'oc_469678cc3cd264438f9bbb65da534c0b';
+  const bossId = 'ou_3e48baef1bd71cc89fb5a364be55cafc';
+  const targetChatId = 'oc_a016323a9fda4263ab5a27976065088e';
+  const bitableAppToken = 'KNiibDP6KaRwopsPbRucr752ntg';
+  const bitableTableId = 'tblyDHrGGTQTaex6';
+  
+  // 关键词检测
+  const feedbackKeywords = ['bug', '问题', '报错', '故障', '异常', '反馈', 'issue', '错误', '需求', '优化', '改进', '建议', '无法', '不能', '失败', '崩溃'];
+  
+  // 这里应该调用飞书API获取消息并处理
+  // 实际实现需要获取tenant_access_token并调用im/v1/messages
+" >> /home/admin/openclaw/workspace/logs/cron_monitor.log 2>&1

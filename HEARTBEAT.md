@@ -1,5 +1,52 @@
 # HEARTBEAT.md
 
-# Keep this file empty (or with only comments) to skip heartbeat API calls.
+## 定时检查任务
 
-# Add tasks below when you want the agent to check something periodically.
+### 每日检查项（轮换执行）
+
+#### 周一：Session 健康检查
+- [ ] 检查 session 大小，超过 10万字符的提醒 Boss 使用 /compact
+- [ ] 检查是否有异常活跃的会话
+
+#### 周二：配置漂移检查
+- [ ] 对比预期配置 vs 实际配置
+- [ ] 检查是否有未授权的变更
+
+#### 周三：记忆系统维护
+- [ ] 检查 memory/ 日记质量
+- [ ] 提炼有价值信息反写到 MEMORY.md
+
+#### 周四：技能安全检查
+- [ ] 检查已安装技能的权限状态
+- [ ] 确认无 DANGEROUS 标记技能被启用
+
+#### 周五：周报汇总
+- [ ] 汇总本周使用数据
+- [ ] 识别高频任务，优化工作流
+
+### 触发条件
+
+**自动触发**（配置在 cron 中）：
+- 每天 11:00 检查一次
+
+**手动触发**：
+- Boss 说"检查一下"或"巡检"
+
+### 状态追踪
+
+心跳检查状态保存在 `memory/heartbeat-state.json`：
+```json
+{
+  "lastChecks": {
+    "session": "2026-03-16",
+    "config": "2026-03-15",
+    "memory": "2026-03-14",
+    "security": "2026-03-13"
+  }
+}
+```
+
+### 汇报风格
+
+- 发现问题 → 主动汇报
+- 一切正常 → 安静执行，不打扰 Boss
