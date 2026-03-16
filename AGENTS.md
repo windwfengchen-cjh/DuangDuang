@@ -261,6 +261,12 @@ Boss 说"复盘" →
 - 有什么教训？下次如何改进？
 - 有什么新发现或洞察？
 
+**复盘后必须执行：**
+1. 检查 AGENTS.md、SOUL.md、HEARTBEAT.md、TOOLS.md 是否有更新
+2. 如有更新，执行 `git add` + `git commit` 提交变更
+3. Commit message 格式：`docs: update after review - 简要说明`
+4. 通知 Boss 已提交到 git
+
 ### 3. 执行任务时的汇报风格
 
 **规则：** Boss 明确要求后，执行任务时**不得**发送中间步骤，**必须**在任务完成后统一汇报结果。
