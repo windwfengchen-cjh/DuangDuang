@@ -372,7 +372,16 @@ result = send_post_message(
 - 当施嘉科或宋广智在「猛龙队开发」群给出回复后
 - 将回复内容转发回「产研-融合业务组」
 - 标题用「【反馈回复】」
-- 无需再次@任何人
+- **必须 @ 原始提问人**（让提问者收到通知）
+
+**示例脚本（带 @ 提问人）：**
+```bash
+python3 /home/admin/openclaw/workspace/send_feishu_post.py \
+  --chat-id oc_469678cc3cd264438f9bbb65da534c0b \
+  --title "【反馈回复】" \
+  --content "回复内容..." \
+  --at "原始提问人_open_id:姓名"
+```
 
 **Step 3: 记录到飞书表格**
 - 表格链接：https://gz-junbo.feishu.cn/base/KNiibDP6KaRwopsPbRucr752ntg
