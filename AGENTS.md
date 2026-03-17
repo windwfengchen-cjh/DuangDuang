@@ -561,7 +561,40 @@ python3 /home/admin/openclaw/workspace/send_feishu_post.py \
 - 后果：@错了人（@郑秀丽 而非 @苏键伟）
 - 教训：**必须先查来源群，再查对应群的成员列表**
 
-**Step 3: 记录到飞书表格**
+**Step 3: 更新表格处理状态 ⚠️ 关键步骤，不可遗漏**
+转发回复后，**必须**更新飞书表格中的处理状态：
+
+```bash
+# 更新记录状态
+python3 -c "
+from feishu_bitable_update_record import update_record
+
+update_record(
+    app_token='KNiibDP6KaRwopsPbRucr752ntg',
+    table_id='tblyDHrGGTQTaex6',
+    record_id='记录ID',  # 从之前创建的记录中获取
+    fields={
+        '处理状态': '处理中',  # 或 '已解决'
+        '处理结果': '回复内容摘要'
+    }
+)
+"
+```
+
+**状态流转规则：**
+| 场景 | 处理状态 | 处理结果 |
+|------|---------|---------|
+| 收到反馈，刚转发 | 待处理 | 空 |
+| 处理人给出回复 | 处理中 | 回复内容摘要 |
+| 问题完全解决 | 已解决 | 解决方案说明 |
+| 问题无法解决/不需要解决 | 已关闭 | 关闭原因 |
+
+**❌ 遗漏案例（2026-03-17）：**
+- 问题：转发回复后未更新表格状态
+- 后果：表格中记录仍显示"待处理"，与实际情况不符
+- 教训：**转发回复和更新表格是同步执行的，缺一不可**
+
+**Step 4: 记录新反馈到飞书表格**
 - 表格链接：https://gz-junbo.feishu.cn/base/KNiibDP6KaRwopsPbRucr752ntg
 - **重复检测**：同一用户同一问题不重复记录（检查反馈人+问题内容）
 - 填充字段：
