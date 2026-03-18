@@ -78,6 +78,8 @@ def extract_status_and_result(message_text: str) -> Tuple[Optional[str], str]:
         "完成了": "已解决",
         "处理好了": "已解决",
         "同步好了": "已解决",
+        "已上线": "已解决",
+        "上线": "已解决",
         "已关闭": "已关闭",
         "无需处理": "已关闭",
         "重复问题": "已关闭",
