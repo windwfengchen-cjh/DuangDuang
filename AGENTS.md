@@ -474,6 +474,13 @@ python3 /home/admin/openclaw/workspace/send_feishu_post.py \
 - 避免了旧 Images API 的权限限制
 - 自动处理下载、上传、清理流程
 
+**重要规则：图片直接转发，不做任何解析识别**
+- ✅ 收到带图片的消息 → 直接转发原图
+- ❌ 不进行 OCR 文字识别
+- ❌ 不进行图片内容分析
+- ❌ 不生成图片描述
+- ✅ 保持图片原始质量和内容
+
 **Skill 使用方式：**
 ```bash
 openclaw skills run feishu-feedback-handler forward-message \
