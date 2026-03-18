@@ -14,6 +14,16 @@
     "role": "处理人",
     "description": "开发工程师"
   },
+  "ou_834914563c797190697ca36b074a6952": {
+    "name": "郑武友",
+    "role": "处理人",
+    "description": "配置4处理人"
+  },
+  "ou_e0b3221ff687bea25dd88257dbbb30d4": {
+    "name": "李川平",
+    "role": "处理人",
+    "description": "开发工程师"
+  },
   "ou_d03303783b5538c608b540dc8ad9ac87": {
     "name": "梁思洁",
     "role": "反馈人",
@@ -71,8 +81,8 @@
   "ou_8e345cfadc3faac8bef65129c7d04ad6": {
     "name": "曹敏",
     "role": "反馈人",
-    "description": "号卡能力中心信息同频群成员",
-    "source": "号卡能力中心信息同频群"
+    "description": "号卡破解产研沟通群成员",
+    "source": "号卡破解产研沟通群"
   },
   "ou_7e1424dfd5f44af02aa6d486ab255f5d": {
     "name": "梁显光",
@@ -85,5 +95,17 @@
     "role": "反馈人",
     "description": "号卡能力中心信息同频群成员",
     "source": "号卡能力中心信息同频群"
+  },
+  "ou_a41f4c2c7b005523668988a9bfd2d778": {
+    "name": "杨政航",
+    "role": "反馈人",
+    "description": "号卡破解产研沟通群成员",
+    "source": "号卡破解产研沟通群"
+  },
+  "ou_4cff36de5332eed5b8ec28a45857aec0": {
+    "name": "陈伟军",
+    "role": "反馈人",
+    "description": "号卡破解产研沟通群成员",
+    "source": "号卡破解产研沟通群"
   }
 }
