@@ -463,75 +463,70 @@ python3 /home/admin/openclaw/workspace/send_feishu_post.py \
   --at "ou_3e48baef1bd71cc89fb5a364be55cafc:陈俊洪"
 ```
 
-**富媒体（图片/文件）转发流程：**
+**富媒体（图片/文件）转发规则：**
 
-**⚠️ 重要限制：** 由于飞书安全策略，机器人**无法下载其他用户发送的图片**（错误：`The app is not the resource sender`）。已采用**消息链接方案**替代。
+### 📋 图片转发必须使用 Skill
 
-**转发流程（消息链接方案）：**
+**规则：在所有群中转发图片，都必须使用 `feishu-feedback-handler` Skill**
+
+**原因：**
+- 使用 Resource API 可以下载**任何人**发送的图片
+- 避免了旧 Images API 的权限限制
+- 自动处理下载、上传、清理流程
+
+**Skill 使用方式：**
+```bash
+openclaw skills run feishu-feedback-handler forward-message \
+  --source-chat-id <来源群ID> \
+  --message-id <消息ID> \
+  --image-key <图片key>
+```
+
+### 📊 图片转发流程
+
 ```
 收到来源群带图片的消息
     ↓
-提取消息 ID 和图片信息
+提取 message_id 和 image_key
     ↓
-尝试下载图片
-    ├── 成功 → 重新上传并转发
-    └── 失败 → 生成消息链接
+使用 Resource API 下载图片
     ↓
-发送消息（文字说明 + 消息链接）
+上传到飞书获取新的 image_key
+    ↓
+转发到目标群（文字 + 图片）
+    ↓
+自动清理本地临时文件
 ```
 
-**富媒体消息处理规则：**
+### 🛡️ 失败处理
 
-| 媒体类型 | 处理方式 | 转发内容 |
-|---------|---------|---------|
-| **图片（自己发送）** | 下载原图 → 重新上传 | 文字描述 + 图片 |
-| **图片（其他用户）** | 生成消息链接 | 文字描述 + [点击查看原消息和图片](链接) |
-| **文件** | 获取文件 → 重新上传 | 文字描述 + 文件 |
-| **图文混排** | 消息链接方案 | 文字描述 + 消息链接 |
+如果图片下载失败：
+- **直接报错**，不再使用消息链接方案
+- 通知 Boss 图片转发失败
+- 检查 message_id 和 image_key 是否正确
 
-**富媒体转发示例（消息链接方案）：**
+### 📁 存储清理机制
 
-```
-【产研反馈-Bug】（含消息链接）
-
-反馈人：张三 | 来源：产研-融合业务组
-
-问题描述：
-登录页面报错
-
-📎 原消息包含图片，点击查看：
-[点击查看原消息和图片](https://applink.feishu.cn/client/message/open?message_id=xxx)
-
-@施嘉科 @宋广智 请查看~
-```
-
-**技术说明：**
-- 使用 `im:resource` 权限读取消息中的媒体资源
-- 机器人**只能下载自己发送的图片**，其他用户发的图片会生成消息链接
-- 消息链接格式：`https://applink.feishu.cn/client/message/open?message_id=xxx`
-- 接收者点击链接可在飞书客户端中跳转到原消息查看图片
-- 超大文件（>20MB）可能受飞书限制，会转为链接形式
-
-**存储清理机制：**
 - 所有下载的临时文件保存在系统临时目录（`/tmp`）
 - 转发完成后**自动删除**本地文件，不占用存储空间
 - 清理逻辑使用 `try...finally` 确保即使转发失败也会清理
 
-```python
-# 伪代码示例
-forward_with_media(source_message, target_chat_id, title, at_list)
-    ↓
-download_media() → 保存到 /tmp/feishu_forward_xxx.png
-    ↓
-upload_image() → 上传到飞书获取 image_key
-    ↓
-send_rich_message() → 发送消息
-    ↓
-finally:
-    os.remove() → 自动清理临时文件
+### 🔧 技术实现
+
+**Skill 内部调用：**
+```typescript
+// 使用 Resource API 下载（支持任何人发的图片）
+GET /open-apis/im/v1/messages/{message_id}/resources/{file_key}?type=image
 ```
 
-**脚本位置：** `/home/admin/openclaw/workspace/forward_media.py`
+**文件位置：**
+- Skill 代码：`/home/admin/.openclaw/skills/feishu-feedback-handler/`
+- 备用脚本：`/home/admin/openclaw/workspace/forward_media.py`（仅测试使用）
+
+**禁止行为：**
+- ❌ 不再使用消息链接方案
+- ❌ 不再使用 Images API（只能下载自己发的图片）
+- ❌ 不直接调用脚本，统一使用 Skill
 
 **Step 2: 收到处理人回复 → 转发回来源群**
 - 当施嘉科或宋广智在「猛龙队开发」群给出回复后
