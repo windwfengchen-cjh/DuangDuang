@@ -180,19 +180,7 @@ if success:
 - 检查 image_key 是否正确
 - 检查图片是否已被删除
 
-## 与其他用户图片的兼容方案
 
-由于机器人无法下载其他用户发送的图片，建议采用以下方案：
-
-```python
-# 方案：消息链接转发
-def forward_with_link(original_message_url: str, text_content: str):
-    """
-    对于无法下载的图片，发送消息链接让用户点击查看原图
-    """
-    message = f"{text_content}\n\n📎 原消息包含图片，点击查看：\n{original_message_url}"
-    # 发送文字消息...
-```
 
 ## 文件位置
 
