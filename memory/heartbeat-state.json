@@ -1,15 +1,17 @@
 {
   "lastChecks": {
     "session": "2026-03-16",
-    "config": "2026-03-15",
-    "memory": "2026-03-14",
-    "security": "2026-03-13"
+    "config": "2026-03-17",
+    "memory": "2026-03-18",
+    "security": "2026-03-13",
+    "overdue": "2026-03-17"
   },
   "sessionCheck": {
     "date": "2026-03-16",
-    "mainSession": "99k/128k (78%)",
-    "feishuGroupSession": "29k/128k (23%)",
-    "status": "warning",
-    "note": "Main session at 78%, approaching 80% threshold; recommend /compact soon; group session stable"
+    "mainSession": "80k/128k (63%)",
+    "feishuGroup1": "77k/128k (60%)",
+    "feishuGroup2": "25k/128k (19%)",
+    "status": "healthy",
+    "note": "All sessions under 80% threshold, no action needed"
   }
 }
