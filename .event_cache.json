@@ -1,0 +1,17 @@
+{
+  "events": [
+    {
+      "message_id": "test_001",
+      "chat_id": "oc_469678cc3cd264438f9bbb65da534c0b",
+      "chat_name": "产研-融合业务组",
+      "sender_id": "ou_test123",
+      "sender_name": "测试用户",
+      "content": "@DuangDuang 这是一个测试问题",
+      "timestamp": "2026-03-17T14:29:47.019838",
+      "processed": true,
+      "logged_at": "2026-03-17T14:29:47.019858",
+      "processed_at": "2026-03-17T14:29:47.020119"
+    }
+  ],
+  "last_check": null
+}
