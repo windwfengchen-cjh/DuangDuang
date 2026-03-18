@@ -195,6 +195,33 @@ def update_record_status(record_id: str, status: str, result: str, token: str) -
         print(f"更新记录失败: {e}")
         return False
 
+def get_user_id_by_name(user_name: str) -> Optional[str]:
+    """
+    根据姓名查找用户Open ID
+    
+    Args:
+        user_name: 用户姓名
+    
+    Returns:
+        Open ID 或 None
+    """
+    try:
+        contacts_file = "/home/admin/openclaw/workspace/feishu_contacts.json"
+        if os.path.exists(contacts_file):
+            with open(contacts_file, 'r', encoding='utf-8') as f:
+                contacts = json.load(f)
+                # 遍历查找匹配的姓名
+                for user_id, info in contacts.items():
+                    if isinstance(info, dict) and info.get('name') == user_name:
+                        return user_id
+                    elif isinstance(info, str) and info == user_name:
+                        return user_id
+        return None
+    except Exception as e:
+        print(f"  ⚠️ 查找用户ID失败: {e}")
+        return None
+
+
 def forward_reply_to_source(matched: dict, status: str, result: str, sender_name: str, token: str) -> bool:
     """
     转发处理结果到来源群
@@ -239,9 +266,18 @@ def forward_reply_to_source(matched: dict, status: str, result: str, sender_name
     content_blocks.append([{"tag": "text", "text": f"结果：{result}"}])
     content_blocks.append([{"tag": "text", "text": ""}])
     
-    # @反馈人
+    # @反馈人 - 使用at标签高亮
     if feedback_user:
-        content_blocks.append([{"tag": "text", "text": f"@{feedback_user} 问题已处理，请查看~"}])
+        feedback_user_id = get_user_id_by_name(feedback_user)
+        if feedback_user_id:
+            # 使用at标签，会高亮显示
+            content_blocks.append([
+                {"tag": "at", "user_id": feedback_user_id, "user_name": feedback_user},
+                {"tag": "text", "text": " 问题已处理，请查看~"}
+            ])
+        else:
+            # 找不到ID，用纯文本
+            content_blocks.append([{"tag": "text", "text": f"@{feedback_user} 问题已处理，请查看~"}])
     
     post_content = {
         "zh_cn": {
