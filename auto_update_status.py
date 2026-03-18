@@ -150,7 +150,10 @@ def search_records_by_keywords(keywords: list, token: str) -> Optional[Dict]:
                             'record_id': record.get('record_id'),
                             'title': title,
                             'content': content,
-                            'status': status
+                            'status': status,
+                            '来源群': fields.get('来源群', ''),
+                            '反馈人': fields.get('反馈人', ''),
+                            '原始消息ID': fields.get('原始消息ID', '')
                         }
             
             return None
@@ -189,6 +192,99 @@ def update_record_status(record_id: str, status: str, result: str, token: str) -
     except Exception as e:
         print(f"更新记录失败: {e}")
         return False
+
+def forward_reply_to_source(matched: dict, status: str, result: str, sender_name: str, token: str) -> bool:
+    """
+    转发处理结果到来源群
+    
+    Args:
+        matched: 匹配的记录信息
+        status: 处理状态
+        result: 处理结果
+        sender_name: 处理人姓名
+        token: 飞书token
+    
+    Returns:
+        是否发送成功
+    """
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    
+    # 从记录中获取来源群和反馈人
+    source_chat_id = matched.get('来源群', '')
+    feedback_user = matched.get('反馈人', '')
+    original_message_id = matched.get('原始消息ID', '')
+    
+    if not source_chat_id:
+        print(f"  ⚠️ 未找到来源群信息，跳过转发")
+        return False
+    
+    # 构造回复消息
+    title = matched.get('title', '未知问题')
+    
+    # 构建post消息内容
+    content_blocks = []
+    
+    # 标题
+    content_blocks.append([{"tag": "text", "text": f"【问题处理结果】", "style": {"bold": True}}])
+    content_blocks.append([{"tag": "text", "text": ""}])
+    
+    # 问题信息
+    content_blocks.append([{"tag": "text", "text": f"问题：{title}"}])
+    content_blocks.append([{"tag": "text", "text": f"处理人：{sender_name}"}])
+    content_blocks.append([{"tag": "text", "text": f"状态：{status}"}])
+    content_blocks.append([{"tag": "text", "text": f"结果：{result}"}])
+    content_blocks.append([{"tag": "text", "text": ""}])
+    
+    # @反馈人
+    if feedback_user:
+        content_blocks.append([{"tag": "text", "text": f"@{feedback_user} 问题已处理，请查看~"}])
+    
+    post_content = {
+        "zh_cn": {
+            "title": "【问题处理结果】",
+            "content": content_blocks
+        }
+    }
+    
+    # 发送消息
+    url = "https://open.feishu.cn/open-apis/im/v1/messages"
+    
+    # 如果知道原始消息ID，使用reply方式
+    if original_message_id:
+        url = f"https://open.feishu.cn/open-apis/im/v1/messages/{original_message_id}/reply"
+    
+    payload = {
+        "receive_id": source_chat_id,
+        "msg_type": "post",
+        "content": json.dumps(post_content)
+    }
+    
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        },
+        method='POST'
+    )
+    
+    try:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
+            result_data = json.loads(response.read().decode('utf-8'))
+            if result_data.get('code') == 0:
+                print(f"  ✅ 已转发回复到来源群")
+                return True
+            else:
+                print(f"  ⚠️ 转发失败: {result_data}")
+                return False
+    except Exception as e:
+        print(f"  ⚠️ 转发异常: {e}")
+        return False
+
 
 def handle_at_message(message_data: dict) -> Optional[str]:
     """
@@ -247,7 +343,12 @@ def handle_at_message(message_data: dict) -> Optional[str]:
     success = update_record_status(matched['record_id'], status, result, token)
     
     if success:
-        return f"✅ 已更新「{matched['title']}」为{status}"
+        # 转发回复到来源群
+        forward_result = forward_reply_to_source(matched, status, result, sender_name, token)
+        if forward_result:
+            return f"✅ 已更新「{matched['title']}」为{status}，并已通知来源群"
+        else:
+            return f"✅ 已更新「{matched['title']}」为{status}，但通知来源群失败"
     else:
         return f"❌ 更新失败"
 
