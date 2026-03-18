@@ -107,5 +107,11 @@
     "role": "反馈人",
     "description": "号卡破解产研沟通群成员",
     "source": "号卡破解产研沟通群"
+  },
+  "ou_e5f4eb9c08a5d6abe2e4b568e07907f0": {
+    "name": "乔梦歌",
+    "role": "处理人",
+    "description": "配置5处理人",
+    "source": "新来源群"
   }
 }
