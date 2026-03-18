@@ -959,6 +959,14 @@ Boss：群里XXX反馈了「登录报错」的问题，帮忙转发一下
 
 **当前映射表：** `/home/admin/openclaw/workspace/feishu_contacts.json`
 
+### 新群反馈来源选项自动补充
+
+当处理新群的反馈问题时：
+1. 检查"反馈来源"字段的选项列表
+2. 如果当前来源群名称不在选项中
+3. 自动调用 `feishu_bitable_create_field` 或更新字段属性添加新选项
+4. 继续后续记录流程
+
 ---
 
 ### 扩展配置模板
