@@ -36,6 +36,12 @@
       "zip_url": "https://lightmake.site/api/v1/download?slug=Larry",
       "source": "skillhub",
       "version": ""
+    },
+    "glm-v-model": {
+      "name": "glm-v-model",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=glm-v-model",
+      "source": "skillhub",
+      "version": "1.0.1"
     }
   }
 }
