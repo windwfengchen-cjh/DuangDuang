@@ -1,0 +1,28 @@
+{
+  "name": "Self-Improving Agent",
+  "id": "self_improving_agent",
+  "version": "2.0.0",
+  "description": "A comprehensive self-analysis and continuous improvement system for AI agents. Enables deep performance analysis, error pattern detection, skill gap assessment, and generates actionable improvement recommendations.",
+  "author": "OpenClaw Community",
+  "category": "AI & LLMs",
+  "tags": [
+    "self-improvement",
+    "analysis",
+    "performance",
+    "learning",
+    "optimization"
+  ],
+  "triggers": [
+    "self improvement",
+    "自我提升",
+    "自我分析",
+    "性能优化",
+    "analyze my performance",
+    "自我复盘",
+    "continuous improvement",
+    "run self analysis"
+  ],
+  "entry_point": "SKILL.md",
+  "created_at": "2026-03-19T11:30:00Z",
+  "updated_at": "2026-03-19T11:30:00Z"
+}

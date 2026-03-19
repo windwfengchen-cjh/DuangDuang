@@ -1,0 +1,32 @@
+{
+  "skill_id": "tavily-web-search",
+  "name": "Tavily Web Search 智能搜索",
+  "version": "1.0.0",
+  "source": "local",
+  "installed_at": "2026-03-19T19:30:00+08:00",
+  "installation_method": "manual",
+  "remote_search_status": {
+    "sanwan_ai": {
+      "searched": true,
+      "found": false,
+      "url": "https://sanwan.ai/skills/tavily-web-search.html",
+      "status_code": 404,
+      "reason": "Skill not found in sanwan.ai repository"
+    },
+    "claw123_ai": {
+      "searched": true,
+      "found": false,
+      "api_endpoint": "https://claw123.ai/api/skills.json",
+      "reason": "API unavailable or skill not indexed"
+    },
+    "tavily_official": {
+      "searched": true,
+      "found": true,
+      "url": "https://tavily.com",
+      "status_code": 200,
+      "api_docs": "https://docs.tavily.com",
+      "notes": "Tavily API service confirmed active. Skill created based on official API documentation."
+    }
+  },
+  "notes": "Created locally based on Tavily official API (tavily.com). Remote skill repositories did not contain pre-built skill."
+}

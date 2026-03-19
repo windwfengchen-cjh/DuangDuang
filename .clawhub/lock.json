@@ -1,9 +1,348 @@
 {
-  "version": 1,
+  "version": "1.0.0",
+  "generated_at": "2026-03-19T19:35:00+08:00",
+  "source": "https://sanwan.ai/skills.html",
   "skills": {
-    "summarize": {
-      "version": "1.0.0",
-      "installedAt": 1773632223560
+    "installed": [
+      {
+        "name": "Self-Improving Agent",
+        "id": "self_improving_agent",
+        "version": "2.0.0",
+        "source": "claw123.ai",
+        "installed_at": "2026-03-19T19:30:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "网页搜索",
+        "id": "web-search",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "浏览器控制",
+        "id": "browser-vision",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "股票监控",
+        "id": "stock-monitor",
+        "version": "realtime_monitor.py",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "视频总结",
+        "id": "video-summary",
+        "version": "vsum skill",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "AI文本人性化",
+        "id": "humanizer",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "天气查询",
+        "id": "weather",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "AI图片生成",
+        "id": "image-gen",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "语音合成",
+        "id": "voice-gen",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "PDF生成",
+        "id": "pdf-gen",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "飞书文档",
+        "id": "feishu-doc",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "GitHub操作",
+        "id": "github-ops",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "火车票查询",
+        "id": "train-tickets",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "机票查询",
+        "id": "flight-search",
+        "version": "builtin",
+        "source": "official",
+        "installed_at": "2026-03-19T19:15:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "多Agent团队配置",
+        "id": "multi-agent-setup",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "深度研究",
+        "id": "deep-research",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "SEO内容写作",
+        "id": "seo-writer",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "反爬网页访问",
+        "id": "web-scraper",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "今日热榜",
+        "id": "trending",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "飞书互动卡片",
+        "id": "feishu-cards",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "工作汇报生成",
+        "id": "summary-report",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "自动化工作流",
+        "id": "n8n-automation",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "小红书运营",
+        "id": "xiaohongshu",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "代码助手",
+        "id": "coding",
+        "version": "1.0.0",
+        "source": "official",
+        "installed_at": "2026-03-19T19:20:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "Ontology 本体管理",
+        "id": "ontology",
+        "version": "1.0.0",
+        "source": "local",
+        "installed_at": "2026-03-19T19:30:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "Proactive Agent 主动式智能体",
+        "id": "proactive-agent",
+        "version": "1.0.0",
+        "source": "local",
+        "installed_at": "2026-03-19T19:30:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "Tavily Web Search 智能搜索",
+        "id": "tavily-web-search",
+        "version": "1.0.0",
+        "source": "local",
+        "installed_at": "2026-03-19T19:30:00+08:00",
+        "status": "active"
+      }
+    ],
+    "recommended": [],
+    "available": [
+      {
+        "name": "邮件管理",
+        "id": "email",
+        "category": "communication"
+      },
+      {
+        "name": "飞书日历",
+        "id": "feishu-cal",
+        "category": "productivity"
+      },
+      {
+        "name": "Twitter/X",
+        "id": "twitter",
+        "category": "social"
+      },
+      {
+        "name": "微信公众号",
+        "id": "wechat",
+        "category": "social"
+      },
+      {
+        "name": "竞品研究",
+        "id": "competitor-research",
+        "category": "research"
+      },
+      {
+        "name": "项目管理",
+        "id": "project-manager",
+        "category": "productivity"
+      },
+      {
+        "name": "股票深度分析",
+        "id": "stock-analysis",
+        "category": "finance"
+      },
+      {
+        "name": "港股AI投研",
+        "id": "hk-stock",
+        "category": "finance"
+      },
+      {
+        "name": "AI视频制作",
+        "id": "video-gen",
+        "category": "media",
+        "source": "community"
+      },
+      {
+        "name": "AI音乐生成",
+        "id": "music-gen",
+        "category": "media",
+        "source": "community"
+      },
+      {
+        "name": "LinkedIn运营",
+        "id": "linkedin",
+        "category": "social",
+        "source": "community"
+      }
+    ]
+  },
+  "community": {
+    "source": "https://claw123.ai",
+    "total_skills": 5473,
+    "categories": 32,
+    "filtered_malicious": 2748,
+    "api_endpoints": {
+      "skills_json": "https://claw123.ai/api/skills.json",
+      "skills_zh_json": "https://claw123.ai/api/skills.zh.json"
     }
-  }
+  },
+  "installation_report": {
+    "batch_id": "batch_20250319_1930",
+    "installed_at": "2026-03-19T19:30:00+08:00",
+    "total_requested": 3,
+    "successful": 3,
+    "failed": 0,
+    "installed_skills": [
+      "ontology",
+      "proactive-agent",
+      "tavily-web-search"
+    ],
+    "remote_search_results": {
+      "sanwan_ai": {
+        "skills_searched": ["ontology", "proactive-agent", "tavily-web-search"],
+        "found": 0,
+        "not_found_reason": "Skills not available in sanwan.ai repository"
+      },
+      "claw123_ai": {
+        "skills_searched": ["ontology", "proactive-agent", "tavily-web-search"],
+        "found": 0,
+        "api_status": "unavailable_or_not_indexed"
+      },
+      "tavily_official": {
+        "searched": true,
+        "api_service": "confirmed_active",
+        "url": "https://tavily.com"
+      }
+    },
+    "installation_method": "local_creation",
+    "notes": "Skills created locally based on standard patterns. Remote repositories did not contain pre-built versions of these skills."
+  },
+  "previous_installations": [
+    {
+      "batch_id": "batch_20250319_1920",
+      "installed_at": "2026-03-19T19:20:00+08:00",
+      "total_requested": 10,
+      "successful": 10,
+      "failed": 0,
+      "installed_skills": [
+        "multi-agent-setup",
+        "deep-research",
+        "seo-writer",
+        "web-scraper",
+        "trending",
+        "feishu-cards",
+        "summary-report",
+        "n8n-automation",
+        "xiaohongshu",
+        "coding"
+      ]
+    }
+  ]
 }

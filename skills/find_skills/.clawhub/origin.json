@@ -1,0 +1,10 @@
+{
+  "skill_id": "find_skills",
+  "version": "1.0.0",
+  "source": "system",
+  "installed_at": "2026-03-19T19:11:00+08:00",
+  "installed_by": "admin",
+  "path": "/home/admin/openclaw/workspace/skills/find_skills",
+  "checksum": "auto-generated",
+  "verified": true
+}

@@ -1,0 +1,16 @@
+{
+  "skill_id": "ontology",
+  "name": "Ontology 本体管理",
+  "version": "1.0.0",
+  "description": "提供结构化的知识表示和概念关系管理，支持本体推理和知识图谱集成",
+  "author": "system",
+  "created_at": "2026-03-19",
+  "updated_at": "2026-03-19",
+  "category": "knowledge",
+  "tags": ["ontology", "knowledge-graph", "reasoning", "semantic-web", "rdf", "owl"],
+  "entry_point": "SKILL.md",
+  "requires": [],
+  "compatible_with": ["openclaw-agent"],
+  "execution_mode": "on_demand",
+  "status": "active"
+}
