@@ -30,6 +30,12 @@
       "zip_url": "https://lightmake.site/api/v1/download?slug=ontology",
       "source": "skillhub",
       "version": "0.1.2"
+    },
+    "Larry": {
+      "name": "Larry",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=Larry",
+      "source": "skillhub",
+      "version": ""
     }
   }
 }
