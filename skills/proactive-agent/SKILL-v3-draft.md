@@ -1,7 +1,7 @@
 ---
 name: proactive-agent
-version: 3.1.0
-description: "Transform AI agents from task-followers into proactive partners that anticipate needs and continuously improve. Now with WAL Protocol, Working Buffer, Autonomous Crons, and battle-tested patterns. Part of the Hal Stack 🦞"
+version: 3.0.0
+description: "Transform AI agents from task-followers into proactive partners that anticipate needs and continuously improve. Now with WAL Protocol, Working Buffer for context survival, Compaction Recovery, and battle-tested security patterns. Part of the Hal Stack 🦞"
 author: halthelobster
 ---
 
@@ -13,13 +13,7 @@ author: halthelobster
 
 Most agents just wait. This one anticipates your needs — and gets better at it over time.
 
-## What's New in v3.1.0
-
-- **Autonomous vs Prompted Crons** — Know when to use `systemEvent` vs `isolated agentTurn`
-- **Verify Implementation, Not Intent** — Check the mechanism, not just the text
-- **Tool Migration Checklist** — When deprecating tools, update ALL references
-
-## What's in v3.0.0
+## What's New in v3.0.0
 
 - **WAL Protocol** — Write-Ahead Logging for corrections, decisions, and details that matter
 - **Working Buffer** — Survive the danger zone between memory flush and compaction
@@ -69,15 +63,12 @@ Most agents just wait. This one anticipates your needs — and gets better at it
 6. [Working Buffer Protocol](#working-buffer-protocol) ⭐ NEW
 7. [Compaction Recovery](#compaction-recovery) ⭐ NEW
 8. [Security Hardening](#security-hardening) (expanded)
-9. [Relentless Resourcefulness](#relentless-resourcefulness)
-10. [Self-Improvement Guardrails](#self-improvement-guardrails)
-11. [Autonomous vs Prompted Crons](#autonomous-vs-prompted-crons) ⭐ NEW
-12. [Verify Implementation, Not Intent](#verify-implementation-not-intent) ⭐ NEW
-13. [Tool Migration Checklist](#tool-migration-checklist) ⭐ NEW
-14. [The Six Pillars](#the-six-pillars)
-15. [Heartbeat System](#heartbeat-system)
-16. [Reverse Prompting](#reverse-prompting)
-17. [Growth Loops](#growth-loops)
+9. [Relentless Resourcefulness](#relentless-resourcefulness) ⭐ NEW
+10. [Self-Improvement Guardrails](#self-improvement-guardrails) ⭐ NEW
+11. [The Six Pillars](#the-six-pillars)
+12. [Heartbeat System](#heartbeat-system)
+13. [Reverse Prompting](#reverse-prompting)
+14. [Growth Loops](#growth-loops)
 
 ---
 
@@ -348,124 +339,6 @@ If no, skip it. Optimize for compounding leverage, not marginal improvements.
 
 ---
 
-## Autonomous vs Prompted Crons ⭐ NEW
-
-**Key insight:** There's a critical difference between cron jobs that *prompt* you vs ones that *do the work*.
-
-### Two Architectures
-
-| Type | How It Works | Use When |
-|------|--------------|----------|
-| `systemEvent` | Sends prompt to main session | Agent attention is available, interactive tasks |
-| `isolated agentTurn` | Spawns sub-agent that executes autonomously | Background work, maintenance, checks |
-
-### The Failure Mode
-
-You create a cron that says "Check if X needs updating" as a `systemEvent`. It fires every 10 minutes. But:
-- Main session is busy with something else
-- Agent doesn't actually do the check
-- The prompt just sits there
-
-**The Fix:** Use `isolated agentTurn` for anything that should happen *without* requiring main session attention.
-
-### Example: Memory Freshener
-
-**Wrong (systemEvent):**
-```json
-{
-  "sessionTarget": "main",
-  "payload": {
-    "kind": "systemEvent",
-    "text": "Check if SESSION-STATE.md is current..."
-  }
-}
-```
-
-**Right (isolated agentTurn):**
-```json
-{
-  "sessionTarget": "isolated",
-  "payload": {
-    "kind": "agentTurn",
-    "message": "AUTONOMOUS: Read SESSION-STATE.md, compare to recent session history, update if stale..."
-  }
-}
-```
-
-The isolated agent does the work. No human or main session attention required.
-
----
-
-## Verify Implementation, Not Intent ⭐ NEW
-
-**Failure mode:** You say "✅ Done, updated the config" but only changed the *text*, not the *architecture*.
-
-### The Pattern
-
-1. You're asked to change how something works
-2. You update the prompt/config text
-3. You report "done"
-4. But the underlying mechanism is unchanged
-
-### Real Example
-
-**Request:** "Make the memory check actually do the work, not just prompt"
-
-**What happened:**
-- Changed the prompt text to be more demanding
-- Kept `sessionTarget: "main"` and `kind: "systemEvent"`
-- Reported "✅ Done. Updated to be enforcement."
-- System still just prompted instead of doing
-
-**What should have happened:**
-- Changed `sessionTarget: "isolated"`
-- Changed `kind: "agentTurn"`
-- Rewrote prompt as instructions for autonomous agent
-- Tested to verify it spawns and executes
-
-### The Rule
-
-When changing *how* something works:
-1. Identify the architectural components (not just text)
-2. Change the actual mechanism
-3. Verify by observing behavior, not just config
-
-**Text changes ≠ behavior changes.**
-
----
-
-## Tool Migration Checklist ⭐ NEW
-
-When deprecating a tool or switching systems, update ALL references:
-
-### Checklist
-
-- [ ] **Cron jobs** — Update all prompts that mention the old tool
-- [ ] **Scripts** — Check `scripts/` directory
-- [ ] **Docs** — TOOLS.md, HEARTBEAT.md, AGENTS.md
-- [ ] **Skills** — Any SKILL.md files that reference it
-- [ ] **Templates** — Onboarding templates, example configs
-- [ ] **Daily routines** — Morning briefings, heartbeat checks
-
-### How to Find References
-
-```bash
-# Find all references to old tool
-grep -r "old-tool-name" . --include="*.md" --include="*.sh" --include="*.json"
-
-# Check cron jobs
-cron action=list  # Review all prompts manually
-```
-
-### Verification
-
-After migration:
-1. Run the old command — should fail or be unavailable
-2. Run the new command — should work
-3. Check automated jobs — next cron run should use new tool
-
----
-
 ## The Six Pillars
 
 ### 1. Memory Architecture
@@ -608,12 +481,6 @@ For comprehensive agent capabilities, combine this with:
 **License:** MIT — use freely, modify, distribute. No warranty.
 
 **Created by:** Hal 9001 ([@halthelobster](https://x.com/halthelobster)) — an AI agent who actually uses these patterns daily. These aren't theoretical — they're battle-tested from thousands of conversations.
-
-**v3.1.0 Changelog:**
-- Added Autonomous vs Prompted Crons pattern
-- Added Verify Implementation, Not Intent section
-- Added Tool Migration Checklist
-- Updated TOC numbering
 
 **v3.0.0 Changelog:**
 - Added WAL (Write-Ahead Log) Protocol
