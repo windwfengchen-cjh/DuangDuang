@@ -1,0 +1,13 @@
+{
+  "tasks": [
+    {
+      "id": "e12fcb03-04fa-44eb-b479-be8b0b95d595",
+      "sessionKey": "agent:main:subagent:34b983d6-ef00-4bb4-81c2-87fda12edca0",
+      "description": "查看并规整4个产品信息链接（欣网、联发、天诺、众联）",
+      "status": "running",
+      "createdAt": "2026-03-19T12:07:00+08:00",
+      "timeout": 300
+    }
+  ],
+  "lastUpdated": "2026-03-19T12:07:00+08:00"
+}

@@ -1,0 +1,19 @@
+{
+  "skill_id": "clawsec",
+  "name": "ClawSec Security Suite",
+  "version": "1.0.0",
+  "description": "完整的 OpenClaw AI 智能体安全技能套件，提供安全监控、完整性验证和威胁情报",
+  "author": "Prompt Security",
+  "homepage": "https://clawsec.prompt.security",
+  "source": "https://github.com/prompt-security/clawsec",
+  "created_at": "2026-03-19",
+  "updated_at": "2026-03-19",
+  "category": "security",
+  "tags": ["security", "monitoring", "threat-intelligence", "integrity", "cve", "audit", "openclaw", "nanoclaw"],
+  "entry_point": "SKILL.md",
+  "requires": ["node", "curl", "jq"],
+  "compatible_with": ["openclaw-agent", "nanoclaw", "moltbot", "clawdbot"],
+  "execution_mode": "on_demand",
+  "status": "active",
+  "license": "AGPL-3.0"
+}

@@ -5,14 +5,6 @@
   "skills": {
     "installed": [
       {
-        "name": "Self-Improving Agent",
-        "id": "self_improving_agent",
-        "version": "2.0.0",
-        "source": "claw123.ai",
-        "installed_at": "2026-03-19T19:30:00+08:00",
-        "status": "active"
-      },
-      {
         "name": "网页搜索",
         "id": "web-search",
         "version": "builtin",

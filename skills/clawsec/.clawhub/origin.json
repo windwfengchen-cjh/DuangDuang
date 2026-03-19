@@ -1,0 +1,12 @@
+{
+  "source": "https://github.com/prompt-security/clawsec",
+  "source_type": "github",
+  "installed_at": "2026-03-19T19:56:00+08:00",
+  "installed_by": "admin",
+  "installation_method": "manual",
+  "version": "1.0.0",
+  "commit": "main",
+  "repository_url": "https://github.com/prompt-security/clawsec",
+  "homepage": "https://clawsec.prompt.security",
+  "documentation": "https://github.com/prompt-security/clawsec/blob/main/README.md"
+}

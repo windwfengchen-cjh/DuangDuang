@@ -1,0 +1,87 @@
+=== Self-Improving Agent 技能查找日志 ===
+查找时间: Thu 2026-03-19 18:57 GMT+8
+
+[步骤 1] 检查环境
+- find-skill 命令: 未找到
+- .clawhub/lock.json: 存在
+- skills/ 目录: 存在
+
+当前已安装技能:
+- summarize (v1.0.0)
+- feishu_forward (v1.1.0)
+- coordinator_workflow (v2.0.0)
+
+[步骤 2] 尝试查找 self-improving-agent 技能
+尝试的 skillId 列表:
+1. self-improving-agent - 未找到
+2. self_improving_agent - 未找到
+3. self_improving - 未找到
+4. improving_agent - 未找到
+5. agent_improve - 未找到
+6. auto_improve - 未找到
+7. meta_learning - 未找到
+8. self_aware - 未找到
+9. auto_evolve - 未找到
+10. reflexion - 未找到
+11. self_refine - 未找到
+12. improve - 未找到
+13. skill-001 - 未找到
+14. improver - 未找到
+15. agentic_improve - 未找到
+16. agent-self-improving - 未找到
+17. clawhub-improve - 未找到
+18. memory_improve - 未找到
+19. self-improve - 未找到
+20. auto-skill - 未找到
+21. skill-updater - 未找到
+22. skill_enhancer - 未找到
+23. agent_enhancer - 未找到
+24. capability_improve - 未找到
+25. upgrade - 未找到
+26. upgrader - 未找到
+27. agent_upgrade - 未找到
+28. evolve - 未找到
+29. evolver - 未找到
+30. recursive - 未找到
+31. bootstrap - 未找到
+32. bootstrapping - 未找到
+33. self_bootstrap - 未找到
+34. skill_discovery - 未找到
+35. skill_search - 未找到
+36. find_skill - 未找到
+37. a1b2c3d4 - 未找到
+38. self-improving-agent-v1 - 未找到
+39. si-agent - 未找到
+40. sia - 未找到
+41. autonomous_improvement - 未找到
+42. skill_autonomy - 未找到
+43. agent_autonomy - 未找到
+44. adaptive_agent - 未找到
+45. adaptation - 未找到
+46. skill_adaptation - 未找到
+47. self_adaptive - 未找到
+48. self_learning - 未找到
+49. learning - 未找到
+50. skill_learning - 未找到
+51. capability_learning - 未找到
+52. improvement - 未找到
+53. optimization - 未找到
+54. optimizer - 未找到
+55. 00000001 - 未找到
+56. skill-0001 - 未找到
+57. 1 - 未找到
+
+尝试的 taskId 列表:
+1. self-improving-agent - 没有关联技能
+2. self_improving - 没有关联技能
+3. improving - 没有关联技能
+4. agent - 没有关联技能
+5. skill - 没有关联技能
+6. install - 没有关联技能
+
+[步骤 3] 环境检查
+- find-skill 命令: 不存在
+- clawhub CLI: 不存在
+- skill 相关环境变量: 无
+
+[结论] Self-Improving Agent 技能在当前环境中未找到。

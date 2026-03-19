@@ -1,0 +1,18 @@
+{
+  "skill_id": "skill-vetter",
+  "name": "Skill Vetter",
+  "version": "1.0.0",
+  "description": "Security-first vetting for OpenClaw skills. Run a deep-vetting checklist before installing any skill from ClawHub, GitHub, or other sources.",
+  "author": "useclawpro",
+  "created_at": "2026-03-10",
+  "updated_at": "2026-03-19",
+  "category": "Security",
+  "tags": ["security", "vetting", "audit", "skill-review", "safety"],
+  "entry_point": "SKILL.md",
+  "requires": [],
+  "compatible_with": ["openclaw-agent"],
+  "execution_mode": "on_demand",
+  "status": "active",
+  "trust_score": 97,
+  "last_audited": "2026-02-01"
+}

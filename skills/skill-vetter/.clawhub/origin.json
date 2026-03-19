@@ -1,0 +1,13 @@
+{
+  "skill_id": "skill-vetter",
+  "name": "Skill Vetter",
+  "version": "1.0.0",
+  "source": "https://github.com/useclawpro/skill-vetter",
+  "installed_at": "2026-03-19T20:02:00+08:00",
+  "installation_method": "local_copy",
+  "original_path": "/home/admin/.openclaw/skills/skill-vetter",
+  "verified": true,
+  "author": "useclawpro",
+  "category": "Security",
+  "trust_score": 97
+}

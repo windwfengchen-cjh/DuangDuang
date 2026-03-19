@@ -20,6 +20,7 @@ BITABLE_CONFIG = "/home/admin/openclaw/workspace/.feishu_bitable_config.json"
 # 配置2: 号卡&宽带 → 猛龙队开发
 # 配置3: 线下号卡 → 猛龙队开发
 # 配置4: 号卡能力中心信息同频群 → oc_cf3c4adafb332df5988b20204c272dbb
+# 配置5: 待补充 → 猛龙队开发
 FORWARD_CONFIGS = {
     # 配置1: 产研-融合业务组
     "oc_469678cc3cd264438f9bbb65da534c0b": {
@@ -52,10 +53,20 @@ FORWARD_CONFIGS = {
         "target_chat_id": "oc_cf3c4adafb332df5988b20204c272dbb",
         "handlers": [
             {"user_id": "ou_82e152d737ab5aedee7110066828b5a1", "user_name": "施嘉科"},
-            {"user_id": "", "user_name": "郑武友"},  # 待获取，后续自动收集
+            {"user_id": "ou_834914563c797190697ca36b074a6952", "user_name": "郑武友"},
             {"user_id": "ou_3e48baef1bd71cc89fb5a364be55cafc", "user_name": "陈俊洪"}
         ],
         "source_name": "号卡能力中心信息同频群"
+    },
+    # 配置5: 待补充（新来源群）
+    "oc_81299c457f97b260b13a8469bb187c8e": {
+        "target_chat_id": "oc_a016323a9fda4263ab5a27976065088e",
+        "handlers": [
+            {"user_id": "ou_82e152d737ab5aedee7110066828b5a1", "user_name": "施嘉科"},
+            {"user_id": "ou_e0b3221ff687bea25dd88257dbbb30d4", "user_name": "李川平"},
+            {"user_id": "ou_d68b02946c960929136849be2c8be50f", "user_name": "王凯明"}
+        ],
+        "source_name": "待补充"
     }
 }
 
@@ -122,13 +133,50 @@ def upload_image(image_path, token):
         raise Exception(f"上传失败: {result}")
     return result['data']['image_key']
 
-def send_forward_message(token, chat_id, title, content, image_key=None, message_link=None, at_list=None):
+def send_forward_message(token, chat_id, title, content, image_key=None, message_link=None, at_list=None, source_name=None, message_type=None, problem_content=None, original_message_id=None):
     """发送转发消息"""
     # 构造内容块
     content_blocks = []
-    
-    # 正文
+
+    # 正文（反馈人信息）
     content_blocks.append([{"tag": "text", "text": content}])
+
+    # 📌 问题类型
+    if message_type:
+        content_blocks.append([{"tag": "text", "text": ""}])  # 空行
+        content_blocks.append([
+            {"tag": "text", "text": "📌 问题类型：", "style": {"bold": True}},
+            {"tag": "text", "text": message_type}
+        ])
+
+    # 📍 来源群
+    if source_name:
+        content_blocks.append([
+            {"tag": "text", "text": "📍 来源群：", "style": {"bold": True}},
+            {"tag": "text", "text": source_name}
+        ])
+
+    # 🔗 原始消息（添加消息ID和链接）
+    if original_message_id:
+        content_blocks.append([{"tag": "text", "text": ""}])  # 空行
+        content_blocks.append([
+            {"tag": "text", "text": "🔗 原始消息：", "style": {"bold": True}}
+        ])
+        # 添加可点击的消息链接
+        msg_url = f"https://applink.feishu.cn/client/message/open?message_id={original_message_id}"
+        content_blocks.append([{
+            "tag": "a",
+            "text": f"点击查看原消息 ({original_message_id[:15]}...)",
+            "href": msg_url
+        }])
+    
+    # 问题描述
+    if problem_content:
+        content_blocks.append([{"tag": "text", "text": ""}])  # 空行
+        content_blocks.append([
+            {"tag": "text", "text": "问题描述：", "style": {"bold": True}}
+        ])
+        content_blocks.append([{"tag": "text", "text": problem_content}])
     
     # 图片
     if image_key:
@@ -151,11 +199,18 @@ def send_forward_message(token, chat_id, title, content, image_key=None, message
         for i, at in enumerate(at_list):
             if i > 0:
                 at_para.append({"tag": "text", "text": " "})
-            at_para.append({
-                "tag": "at",
-                "user_id": at["user_id"],
-                "user_name": at.get("user_name", "")
-            })
+            # 确保 user_name 不为空，否则@不会高亮
+            user_name = at.get("user_name", "").strip()
+            user_id = at.get("user_id", "").strip()
+            if not user_name:
+                # 如果user_name为空，尝试从contacts查找
+                user_name = "同事"  # 默认名称
+            if user_id:  # 只添加有user_id的@
+                at_para.append({
+                    "tag": "at",
+                    "user_id": user_id,
+                    "user_name": user_name
+                })
         at_para.append({"tag": "text", "text": " 请查看~"})
         content_blocks.append(at_para)
     
@@ -288,10 +343,14 @@ def forward_feedback(source_chat, reporter, content, image_key=None, message_id=
             token=token,
             chat_id=target_chat_id,
             title=title,
-            content=f"反馈人：{reporter} | 来源：{source_name}\n\n问题描述：\n{content}",
+            content=f"反馈人：{reporter}",
             image_key=new_image_key,
             message_link=message_link,
-            at_list=handlers
+            at_list=handlers,
+            source_name=source_name,
+            message_type=message_type,
+            problem_content=content,
+            original_message_id=message_id
         )
         
         if result.get('code') != 0:

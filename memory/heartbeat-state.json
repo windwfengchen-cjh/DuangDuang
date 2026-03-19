@@ -1,17 +1,44 @@
 {
-  "lastChecks": {
-    "session": "2026-03-16",
-    "config": "2026-03-17",
-    "memory": "2026-03-18",
-    "security": "2026-03-13",
-    "overdue": "2026-03-17"
+  "check_time": "2026-03-19T19:03:00+08:00",
+  "check_type": "weekly_skill_security_scan",
+  "overall_status": "PASSED",
+  "installed_skills": [
+    {
+      "name": "summarize",
+      "version": "1.0.0",
+      "installed_at": 1773632223560,
+      "dangerous_mark": false,
+      "permission_level": "standard",
+      "description": "Summarize URLs or files with the summarize CLI",
+      "risks": []
+    },
+    {
+      "name": "feishu_forward",
+      "version": "1.1.0",
+      "installed_at": 1773890700000,
+      "dangerous_mark": false,
+      "permission_level": "standard",
+      "description": "飞书群消息转发与@高亮规范",
+      "risks": [],
+      "notes": "包含群转发配置和@高亮规则，无危险操作"
+    },
+    {
+      "name": "coordinator_workflow",
+      "version": "2.0.0",
+      "installed_at": 1773899800000,
+      "dangerous_mark": false,
+      "permission_level": "standard",
+      "description": "协调者工作流 - 派子智能体执行任务",
+      "risks": [],
+      "notes": "强制执行规则，防止协调者直接执行操作"
+    }
+  ],
+  "summary": {
+    "total_skills": 3,
+    "dangerous_skills": 0,
+    "standard_skills": 3,
+    "requires_attention": false
   },
-  "sessionCheck": {
-    "date": "2026-03-16",
-    "mainSession": "80k/128k (63%)",
-    "feishuGroup1": "77k/128k (60%)",
-    "feishuGroup2": "25k/128k (19%)",
-    "status": "healthy",
-    "note": "All sessions under 80% threshold, no action needed"
-  }
+  "warnings": [],
+  "next_check": "2026-03-26T19:03:00+08:00"
 }
