@@ -102,34 +102,57 @@ def check_skills_version():
     
     skills_status = []
     
-    for skill_name, info in lock_data.get("skills", {}).items():
-        skill_dir = SKILLS_DIR / skill_name
-        meta_file = skill_dir / "_meta.json"
+    # 获取 skills 对象
+    skills_data = lock_data.get("skills", {})
+    
+    # 处理新版 lock.json 结构: { "installed": [...], "recommended": [], "available": [...] }
+    if isinstance(skills_data, dict):
+        # 获取已安装的技能列表
+        installed_skills = skills_data.get("installed", [])
         
-        status = {
-            "name": skill_name,
-            "version": info.get("version"),
-            "installed_at": info.get("installedAt"),
-            "exists": skill_dir.exists(),
-            "meta_exists": meta_file.exists(),
-            "meta_version": None
-        }
-        
-        if meta_file.exists():
-            meta = load_json(meta_file)
-            if meta:
-                status["meta_version"] = meta.get("version")
-                # 检查版本一致性
-                status["version_match"] = (status["version"] == status["meta_version"])
-        
-        skills_status.append(status)
-        
-        if status.get("version_match") is False:
-            logger.warning(f"技能 {skill_name}: 版本不匹配 (lock: {status['version']}, meta: {status['meta_version']})")
-        elif not status["exists"]:
-            logger.error(f"技能 {skill_name}: 目录不存在")
+        if isinstance(installed_skills, list):
+            # 新版结构: installed 是技能对象数组
+            for skill_info in installed_skills:
+                if not isinstance(skill_info, dict):
+                    logger.warning(f"跳过无效的技能条目: {skill_info}")
+                    continue
+                
+                skill_id = skill_info.get("id") or skill_info.get("name")
+                if not skill_id:
+                    logger.warning(f"技能条目缺少 id 或 name: {skill_info}")
+                    continue
+                
+                skill_dir = SKILLS_DIR / skill_id
+                meta_file = skill_dir / "_meta.json"
+                
+                status = {
+                    "name": skill_id,
+                    "version": skill_info.get("version"),
+                    "installed_at": skill_info.get("installed_at") or skill_info.get("installedAt"),
+                    "exists": skill_dir.exists(),
+                    "meta_exists": meta_file.exists(),
+                    "meta_version": None
+                }
+                
+                if meta_file.exists():
+                    meta = load_json(meta_file)
+                    if meta:
+                        status["meta_version"] = meta.get("version")
+                        # 检查版本一致性
+                        status["version_match"] = (status["version"] == status["meta_version"])
+                
+                skills_status.append(status)
+                
+                if status.get("version_match") is False:
+                    logger.warning(f"技能 {skill_id}: 版本不匹配 (lock: {status['version']}, meta: {status['meta_version']})")
+                elif not status["exists"]:
+                    logger.error(f"技能 {skill_id}: 目录不存在")
+                else:
+                    logger.info(f"技能 {skill_id}: v{status['version']} - 正常")
         else:
-            logger.info(f"技能 {skill_name}: v{status['version']} - 正常")
+            logger.error("lock.json 中的 'skills.installed' 不是数组")
+    else:
+        logger.error("lock.json 中的 'skills' 不是对象")
     
     return skills_status
 
