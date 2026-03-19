@@ -56,3 +56,20 @@ Traceback (most recent call last):
   File "/home/admin/openclaw/workspace/self_improve.py", line 111, in check_skills_version
     "version": info.get("version"),
 AttributeError: 'list' object has no attribute 'get'
+2026-03-19 20:25:11,951 - self_improving_agent - INFO - ╔================================================╗
+2026-03-19 20:25:11,951 - self_improving_agent - INFO - ║           Self-Improving Agent 开始执行            ║
+2026-03-19 20:25:11,951 - self_improving_agent - INFO - ╚================================================╝
+2026-03-19 20:25:11,951 - self_improving_agent - INFO - 执行时间: 2026-03-19 20:25:11
+2026-03-19 20:25:11,952 - self_improving_agent - INFO - ==================================================
+2026-03-19 20:25:11,952 - self_improving_agent - INFO - 步骤 1: 读取 SOUL.md 检查约束遵守情况
+2026-03-19 20:25:11,952 - self_improving_agent - INFO - 成功读取 SOUL.md (4477 字符)
+2026-03-19 20:25:11,952 - self_improving_agent - INFO - 识别的约束: 安全原则
+2026-03-19 20:25:11,952 - self_improving_agent - INFO - ==================================================
+2026-03-19 20:25:11,952 - self_improving_agent - INFO - 步骤 2: 检查所有技能的版本和更新
+2026-03-19 20:25:11,953 - self_improving_agent - ERROR - 执行过程中发生错误
+Traceback (most recent call last):
+  File "/home/admin/openclaw/workspace/self_improve.py", line 301, in main
+    skills_status = check_skills_version()
+  File "/home/admin/openclaw/workspace/self_improve.py", line 111, in check_skills_version
+    "version": info.get("version"),
+AttributeError: 'list' object has no attribute 'get'
