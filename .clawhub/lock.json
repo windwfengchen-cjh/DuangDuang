@@ -219,6 +219,62 @@
         "source": "local",
         "installed_at": "2026-03-19T19:30:00+08:00",
         "status": "active"
+      },
+      {
+        "name": "ClawSec Security Suite",
+        "id": "clawsec",
+        "version": "1.0.0",
+        "source": "https://github.com/prompt-security/clawsec",
+        "installed_at": "2026-03-19T19:56:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "Skill Vetter",
+        "id": "skill-vetter",
+        "version": "1.0.0",
+        "source": "https://github.com/useclawpro/skill-vetter",
+        "installed_at": "2026-03-19T20:05:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "Coordinator Workflow",
+        "id": "coordinator_workflow",
+        "version": "2.0.0",
+        "source": "openclaw",
+        "installed_at": "2026-03-19T12:05:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "Feishu Forward",
+        "id": "feishu_forward",
+        "version": "1.1.0",
+        "source": "openclaw",
+        "installed_at": "2026-03-19T10:46:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "Find Skills (SkillHub)",
+        "id": "find-skills",
+        "version": "0.1.0",
+        "source": "skillhub",
+        "installed_at": "2026-03-19T20:09:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "Find Skills",
+        "id": "find_skills",
+        "version": "1.0.0",
+        "source": "system",
+        "installed_at": "2026-03-19T19:12:00+08:00",
+        "status": "active"
+      },
+      {
+        "name": "Summarize",
+        "id": "summarize",
+        "version": "1.0.0",
+        "source": "kn70pywhg0fyz996kpa8xj89s57yhv26",
+        "installed_at": "2026-03-16T11:37:00+08:00",
+        "status": "active"
       }
     ],
     "recommended": [],
@@ -293,56 +349,33 @@
       "skills_zh_json": "https://claw123.ai/api/skills.zh.json"
     }
   },
-  "installation_report": {
-    "batch_id": "batch_20250319_1930",
-    "installed_at": "2026-03-19T19:30:00+08:00",
-    "total_requested": 3,
-    "successful": 3,
-    "failed": 0,
-    "installed_skills": [
-      "ontology",
-      "proactive-agent",
-      "tavily-web-search"
-    ],
-    "remote_search_results": {
-      "sanwan_ai": {
-        "skills_searched": ["ontology", "proactive-agent", "tavily-web-search"],
-        "found": 0,
-        "not_found_reason": "Skills not available in sanwan.ai repository"
-      },
-      "claw123_ai": {
-        "skills_searched": ["ontology", "proactive-agent", "tavily-web-search"],
-        "found": 0,
-        "api_status": "unavailable_or_not_indexed"
-      },
-      "tavily_official": {
-        "searched": true,
-        "api_service": "confirmed_active",
-        "url": "https://tavily.com"
-      }
-    },
-    "installation_method": "local_creation",
-    "notes": "Skills created locally based on standard patterns. Remote repositories did not contain pre-built versions of these skills."
-  },
-  "previous_installations": [
+  "installation_history": [
     {
-      "batch_id": "batch_20250319_1920",
-      "installed_at": "2026-03-19T19:20:00+08:00",
-      "total_requested": 10,
-      "successful": 10,
+      "batch_id": "batch_20250319_2005",
+      "installed_at": "2026-03-19T20:05:00+08:00",
+      "total_requested": 1,
+      "successful": 1,
       "failed": 0,
-      "installed_skills": [
-        "multi-agent-setup",
-        "deep-research",
-        "seo-writer",
-        "web-scraper",
-        "trending",
-        "feishu-cards",
-        "summary-report",
-        "n8n-automation",
-        "xiaohongshu",
-        "coding"
-      ]
+      "installed_skills": ["skill-vetter"],
+      "remote_search_results": {
+        "github": {
+          "source": "https://github.com/useclawpro/skill-vetter",
+          "found": true,
+          "skill_name": "Skill Vetter",
+          "description": "Security-first vetting for OpenClaw skills",
+          "author": "useclawpro"
+        },
+        "claw123_ai": {
+          "searched": true,
+          "found_in_community_index": false
+        },
+        "sanwan_ai": {
+          "searched": true,
+          "found": false
+        }
+      },
+      "installation_method": "local_copy",
+      "notes": "skill-vetter skill found in local workspace/skills directory. Already installed and properly configured."
     }
   ]
 }
