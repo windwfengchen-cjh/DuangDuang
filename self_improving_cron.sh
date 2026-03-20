@@ -1,73 +1,67 @@
 #!/bin/bash
-# Self-Improving Agent 自动执行脚本
-# 执行时间: 每天 18:10
-# 创建时间: $(date '+%Y-%m-%d %H:%M:%S')
+# ============================================================
+# Self-Improving Agent 定时任务脚本
+# 每日18:10执行自我提升
+# ============================================================
 
-LOG_DIR="$HOME/logs/self-improving-agent"
-LOG_FILE="$LOG_DIR/self_improving_$(date '+%Y%m%d_%H%M%S').log"
-PID_FILE="/tmp/self_improving_agent.pid"
+set -e
 
-# 创建日志目录
-mkdir -p "$LOG_DIR"
+# 日志文件
+LOG_FILE="/var/log/self_improving.log"
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
-# 检查是否已经在运行
-if [ -f "$PID_FILE" ]; then
-    OLD_PID=$(cat "$PID_FILE")
-    if ps -p "$OLD_PID" > /dev/null 2>&1; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] 错误: self-improving-agent 已在运行 (PID: $OLD_PID)" >> "$LOG_FILE"
-        exit 1
+# 记录开始
+log_message() {
+    echo "[$TIMESTAMP] $1" | tee -a "$LOG_FILE"
+}
+
+log_message "=========================================="
+log_message "🚀 启动每日自我提升任务"
+log_message "=========================================="
+
+# 检查 self-improving-agent skill 是否安装
+SKILL_PATH="$HOME/.openclaw/skills/self-improving-agent"
+if [ ! -d "$SKILL_PATH" ]; then
+    log_message "❌ 错误: self-improving-agent skill 未安装"
+    log_message "   路径: $SKILL_PATH"
+    exit 1
+fi
+
+log_message "✅ Skill 检查通过: self-improving-agent"
+
+# 执行自我提升（通过 OpenClaw CLI 或 API 调用）
+# 方式1: 如果 OpenClaw CLI 可用
+if command -v openclaw &> /dev/null; then
+    log_message "📝 通过 OpenClaw CLI 执行自我提升..."
+    openclaw skill run self-improving-agent --mode daily 2>&1 | tee -a "$LOG_FILE"
+    RESULT=$?
+else
+    # 方式2: 直接调用 skill 脚本
+    log_message "📝 直接调用 skill 脚本执行自我提升..."
+    cd "$SKILL_PATH"
+    if [ -f "script/improve.sh" ]; then
+        bash script/improve.sh --mode daily 2>&1 | tee -a "$LOG_FILE"
+        RESULT=$?
+    elif [ -f "script/run.sh" ]; then
+        bash script/run.sh --mode daily 2>&1 | tee -a "$LOG_FILE"
+        RESULT=$?
+    else
+        log_message "⚠️ 警告: 未找到执行脚本，请手动检查 skill 结构"
+        log_message "   已安装 skills:"
+        ls -la "$HOME/.openclaw/skills/" 2>&1 | tee -a "$LOG_FILE"
+        RESULT=1
     fi
 fi
 
-# 记录当前PID
-echo $$ > "$PID_FILE"
-
-# 写入启动日志
-echo "======================================" >> "$LOG_FILE"
-echo "Self-Improving Agent 自动执行开始" >> "$LOG_FILE"
-echo "执行时间: $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE"
-echo "======================================" >> "$LOG_FILE"
-
-# 设置环境变量
-export PYTHONPATH="/home/admin/openclaw/workspace:$PYTHONPATH"
-export LOG_LEVEL="INFO"
-
-# 执行self-improving-agent技能
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] 开始执行 self-improving-agent..." >> "$LOG_FILE"
-
-# 使用OpenClaw子智能体方式执行
-# 注意: 这里使用claw命令或Python脚本来触发子智能体
-if command -v claw &> /dev/null; then
-    claw run skill self-improving-agent >> "$LOG_FILE" 2>&1
-    EXIT_CODE=$?
-elif [ -f "/home/admin/openclaw/workspace/run_self_improving.py" ]; then
-    python3 /home/admin/openclaw/workspace/run_self_improving.py >> "$LOG_FILE" 2>&1
-    EXIT_CODE=$?
+# 记录结果
+if [ $RESULT -eq 0 ]; then
+    log_message "✅ 自我提升任务完成"
 else
-    # 备用方案: 直接创建子任务标记
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] 触发 self-improving-agent 任务" >> "$LOG_FILE"
-    echo "任务类型: 子智能体执行" >> "$LOG_FILE"
-    echo "任务状态: 已触发" >> "$LOG_FILE"
-    EXIT_CODE=0
+    log_message "⚠️ 自我提升任务执行异常 (退出码: $RESULT)"
 fi
 
-# 记录执行结果
-if [ $EXIT_CODE -eq 0 ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Self-Improving Agent 执行成功" >> "$LOG_FILE"
-else
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Self-Improving Agent 执行失败 (退出码: $EXIT_CODE)" >> "$LOG_FILE"
-fi
+log_message "=========================================="
+log_message "🏁 任务结束"
+log_message "=========================================="
 
-# 清理PID文件
-rm -f "$PID_FILE"
-
-# 记录结束日志
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] 执行结束" >> "$LOG_FILE"
-echo "日志文件: $LOG_FILE" >> "$LOG_FILE"
-echo "======================================" >> "$LOG_FILE"
-echo "" >> "$LOG_FILE"
-
-# 保留最近30天的日志
-find "$LOG_DIR" -name "self_improving_*.log" -type f -mtime +30 -delete 2>/dev/null
-
-exit $EXIT_CODE
+exit $RESULT

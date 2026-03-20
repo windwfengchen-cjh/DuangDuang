@@ -292,4 +292,29 @@ _重要的事件、教训、决策和习惯，值得长期保留。_
 
 ---
 
+## 每日自我提升定时任务（2026-03-20 配置）
+
+### 任务说明
+每天18:10自动执行 Self-Improving Agent 进行自我分析和改进。
+
+### 配置详情
+| 项目 | 配置 |
+|------|------|
+| 执行时间 | 每天 18:10 |
+| 执行脚本 | `self_improving_cron.sh` |
+| 日志路径 | `~/logs/self-improving-agent/cron.log` |
+| Crontab | `10 18 * * * /home/admin/openclaw/workspace/self_improving_cron.sh` |
+
+### 脚本功能
+- 检查 self-improving-agent skill 是否安装
+- 调用 skill 执行每日自我分析和改进
+- 记录执行日志到 `/var/log/self_improving.log`
+
+### 相关文件
+- `self_improving_cron.sh` - 定时任务执行脚本
+- `HEARTBEAT.md` - 定时任务总览
+- `~/logs/self-improving-agent/` - 执行日志目录
+
+---
+
 *最后更新：2026-03-20*
