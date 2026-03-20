@@ -1,6 +1,6 @@
 {
-  "check_time": "2026-03-19T19:03:00+08:00",
-  "check_type": "weekly_skill_security_scan",
+  "check_time": "2026-03-20T09:47:00+08:00",
+  "check_type": "weekly_summary",
   "overall_status": "PASSED",
   "installed_skills": [
     {
@@ -31,14 +31,172 @@
       "description": "协调者工作流 - 派子智能体执行任务",
       "risks": [],
       "notes": "强制执行规则，防止协调者直接执行操作"
+    },
+    {
+      "name": "clawsec",
+      "version": "1.0.0",
+      "installed_at": 1773899760000,
+      "dangerous_mark": false,
+      "permission_level": "security",
+      "source": "https://github.com/prompt-security/clawsec",
+      "description": "ClawSec 安全技能套件 - 提供安全监控、完整性验证和威胁情报",
+      "risks": [],
+      "notes": "安全工具，无危险标记，来源可信(GitHub官方)"
+    },
+    {
+      "name": "skill-vetter",
+      "version": "1.0.0",
+      "installed_at": 1773900300000,
+      "dangerous_mark": false,
+      "permission_level": "security",
+      "source": "https://github.com/useclawpro/skill-vetter",
+      "description": "Security-first vetting for OpenClaw skills - 安全检查工具",
+      "risks": [],
+      "notes": "安全检查工具，提供预安装安全检查清单，无危险标记"
+    },
+    {
+      "name": "tavily-web-search",
+      "version": "1.0.0",
+      "installed_at": 1773899400000,
+      "dangerous_mark": false,
+      "permission_level": "standard",
+      "source": "local",
+      "description": "Tavily Web Search 智能搜索技能",
+      "risks": [],
+      "notes": "网络搜索API调用，有安全注意事项，无危险标记"
+    },
+    {
+      "name": "proactive-agent",
+      "version": "3.1.0",
+      "installed_at": 1773899400000,
+      "dangerous_mark": false,
+      "permission_level": "standard",
+      "source": "local",
+      "description": "主动式自改进AI智能体架构 - Part of Hal Stack",
+      "risks": [],
+      "notes": "包含安全加固部分，禁止连接外部AI代理网络，无危险标记"
+    },
+    {
+      "name": "ontology",
+      "version": "1.0.0",
+      "installed_at": 1773899400000,
+      "dangerous_mark": false,
+      "permission_level": "standard",
+      "source": "local",
+      "description": "Typed knowledge graph for structured agent memory",
+      "risks": [],
+      "notes": "知识图谱数据管理，本地文件操作，无危险标记"
+    },
+    {
+      "name": "find-skills",
+      "version": "0.1.0",
+      "installed_at": 1773900540000,
+      "dangerous_mark": false,
+      "permission_level": "standard",
+      "source": "skillhub",
+      "description": "Find Skills (SkillHub)",
+      "risks": [],
+      "notes": "技能搜索工具，无危险标记"
     }
   ],
   "summary": {
-    "total_skills": 3,
+    "total_skills": 32,
     "dangerous_skills": 0,
-    "standard_skills": 3,
+    "standard_skills": 28,
+    "security_skills": 2,
+    "external_sources": 2,
     "requires_attention": false
   },
+  "external_sources_checked": [
+    {
+      "name": "clawsec",
+      "source": "https://github.com/prompt-security/clawsec",
+      "trust_score": "high",
+      "verified": true
+    },
+    {
+      "name": "skill-vetter",
+      "source": "https://github.com/useclawpro/skill-vetter",
+      "trust_score": "high",
+      "verified": true
+    }
+  ],
   "warnings": [],
-  "next_check": "2026-03-26T19:03:00+08:00"
+  "security_audit_date": "2026-03-19",
+  "next_check": "2026-03-26T22:44:00+08:00",
+  "weekly_summary": {
+    "last_check": "2026-03-20T18:13:00+08:00",
+    "check_type": "friday_weekly_summary",
+    "week_range": "2026-03-16 to 2026-03-20",
+    "total_tasks": 45,
+    "completed_tasks": 42,
+    "completion_rate": "93.3%",
+    "high_frequency_tasks": [
+      {
+        "name": "feishu_feedback_forwarding",
+        "count": 35,
+        "description": "飞书跨群反馈转发处理"
+      },
+      {
+        "name": "skill_installation",
+        "count": 9,
+        "description": "技能安装与更新"
+      },
+      {
+        "name": "contact_management",
+        "count": 10,
+        "description": "联系人映射表管理"
+      },
+      {
+        "name": "configuration_management",
+        "count": 7,
+        "description": "群配置与规则文档更新"
+      },
+      {
+        "name": "security_enhancement",
+        "count": 3,
+        "description": "安全规则更新与攻击防御"
+      }
+    ],
+    "new_skills_installed": [
+      "feishu_forward v1.1.0",
+      "coordinator_workflow v2.1.0",
+      "clawsec v1.0.0",
+      "skill-vetter v1.0.0",
+      "tavily-web-search v1.0.0",
+      "proactive-agent v3.1.0",
+      "glm-v-model v1.0.0",
+      "excalidraw-diagram-generator v1.0.0",
+      "ai-video-generation v1.0.0"
+    ],
+    "major_achievements": [
+      "飞书跨群反馈流转系统 v2.0 上线运行",
+      "协调者-子智能体工作流建立",
+      "MemOS 插件修复完成",
+      "安全加固规则更新",
+      "7个来源群配置完成"
+    ],
+    "issues_fixed": [
+      "发错群/@错人问题 - 添加强制来源群确认",
+      "遗漏表格状态更新 - 建立自动更新机制",
+      "重复记录问题 - 双匹配检测逻辑",
+      "图片下载失败 - Resource API 实现",
+      "@高亮格式错误 - Post消息格式修复"
+    ],
+    "optimization_suggestions": [
+      "协调者工作流优化 - 强制checklist和subagent监控",
+      "飞书转发流程优化 - 配置中心和优先级识别",
+      "数据一致性优化 - 原子操作和自检机制",
+      "监控告警优化 - 自动催促和每日汇总",
+      "技能管理优化 - 分类标签和使用统计"
+    ],
+    "next_week_plan": [
+      "稳定飞书转发系统，处理遗漏问题",
+      "定时汇报机制落地",
+      "技能分类整理",
+      "subagent监控自动化",
+      "配置中心建立"
+    ],
+    "report_file": "memory/weekly-summary-2026-03-20.md"
+  }
 }

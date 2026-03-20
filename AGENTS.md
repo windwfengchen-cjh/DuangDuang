@@ -117,6 +117,47 @@ Reactions are lightweight social signals. Humans use them constantly — they sa
 
 Skills provide your tools. When you need one, check its `SKILL.md`. Keep local notes (camera names, SSH details, voice preferences) in `TOOLS.md`.
 
+### 图片识别工具规范（2026-03-20 新增）
+
+#### 强制要求：双模型综合分析
+
+识别图片时，**必须**同时使用以下两种方式综合分析：
+
+**方式一：Kimi-K2.5 模型识别（基础层）**
+```
+工具: read
+用法: read {"file_path": "/path/to/image.jpg"}
+作用: 获取基础视觉信息
+```
+
+**方式二：GLM-V-Model Skill 识别（深度层）**
+```
+工具: exec 调用脚本
+用法: exec {"command": "python skills/glm-v-model/script/infer_glmv.py --image /path/to/image.jpg"}
+模型: 智谱 GLM-4V/4.6V
+作用: 深度视觉分析、图表解读、视频分析
+```
+
+#### 规则要点
+
+| 规则 | 要求 |
+|------|------|
+| 同时使用两种方式 | ✅ 必须 |
+| 综合两份结果分析 | ✅ 必须 |
+| 仅使用单一方式 | ❌ 禁止 |
+| 只读取EXIF元数据 | ❌ 禁止 |
+
+#### 执行流程
+1. ✅ 使用 `read` 读取图片获取基础信息
+2. ✅ 调用 `infer_glmv.py` 进行深度分析
+3. ✅ 对比、融合两份结果
+4. ✅ 输出综合结论
+
+#### 错误处理
+- 如果方式一失败 → 记录错误，继续执行方式二
+- 如果方式二失败 → 记录错误，使用方式一结果并标注局限性
+- 如果都失败 → 报告无法识别，尝试其他方法
+
 **🎭 Voice Storytelling:** If you have `sag` (ElevenLabs TTS), use voice for stories, movie summaries, and "storytime" moments! Way more engaging than walls of text. Surprise people with funny voices.
 
 **📝 Platform Formatting:**
