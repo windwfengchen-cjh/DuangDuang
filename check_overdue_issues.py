@@ -129,8 +129,17 @@ def parse_datetime(value):
                 continue
     return None
 
-def is_need_type(content):
-    """判断是否是需求/建议类"""
+def is_need_type(fields):
+    """判断是否是需求/建议类 - 优先使用「类型」字段"""
+    # 优先使用表格的「类型」字段（单选：问题/需求）
+    record_type = fields.get('类型', '')
+    if record_type == '需求':
+        return True
+    if record_type == '问题':
+        return False
+    
+    # 如果类型字段为空，则通过内容关键词辅助判断
+    content = fields.get('问题内容', '')
     if not content:
         return False
     content_lower = content.lower()
@@ -154,10 +163,11 @@ def find_overdue_issues_1h(records):
         
         elapsed = now - dt
         if timedelta(hours=1) <= elapsed < timedelta(days=3):
-            content = fields.get('问题内容', '')
-            if is_need_type(content):
+            # 使用「类型」字段判断是否是需求（优先于内容关键词）
+            if is_need_type(fields):
                 continue
             
+            content = fields.get('问题内容', '')
             overdue.append({
                 'record_id': record.get('record_id'),
                 '问题简述': fields.get('业务反馈问题记录表', '无标题'),

@@ -5,9 +5,13 @@ import json
 import requests
 import os
 
-# 从环境变量或配置文件获取
-APP_ID = os.getenv("FEISHU_APP_ID", "cli_a9390dce99f9dbc9")
-APP_SECRET = os.getenv("FEISHU_APP_SECRET", "npTtb8fp0ZwefHldLzFLZf8o4GrdWhP5")
+# 从环境变量获取飞书凭证（禁止硬编码）
+APP_ID = os.environ.get('FEISHU_APP_ID', '')
+APP_SECRET = os.environ.get('FEISHU_APP_SECRET', '')
+
+# 如果环境变量不存在，报错提示
+if not APP_ID or not APP_SECRET:
+    raise ValueError("请设置环境变量 FEISHU_APP_ID 和 FEISHU_APP_SECRET")
 
 # 获取 tenant_access_token
 def get_token():
