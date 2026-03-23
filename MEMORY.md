@@ -6,6 +6,11 @@ _重要的事件、教训、决策和习惯，值得长期保留。_
 
 ## 核心工作原则
 
+### 当前年份确认（铁律）
+**当前是 2026 年，不是 2025 年。**
+
+每次记录时间时，必须确认年份是 2026。常见的错误是把 2026 写成 2025。
+
 ### 需求文档编写规范（2026-03-21 新增 - 铁律）
 
 **规则：以后写需求文档（PRD）时，必须使用 `prd-document` skill。**
@@ -432,4 +437,217 @@ source load_env.sh
 
 ---
 
-*最后更新：2026-03-21*
+---
+
+## 超时提醒规则（2026-03-23 更新 - 铁律）
+
+### 严重超时提醒频率
+**规则：超过3天未处理的问题，每3小时提醒1次（原为每小时）**
+
+**实现方式：**
+- 控制字段：`上次提醒时间`（DateTime 类型）
+- 判断逻辑：当前时间 - 上次提醒时间 >= 3小时
+- 首次提醒：字段为空时立即提醒
+
+**代码实现：**
+```python
+def should_send_severe_reminder(fields):
+    last_reminder_time = fields.get('上次提醒时间', None)
+    if not last_reminder_time:
+        return True
+    last_dt = parse_datetime(last_reminder_time)
+    now = datetime.now()
+    return (now - last_dt).total_seconds() >= 3 * 60 * 60
+```
+
+### 需求类型排除规则
+**Boss 指令（2026-03-21）：需求类反馈不做超时提醒**
+
+**判断依据：**
+1. 优先使用「类型」字段（单选：问题/需求）
+2. 类型 = "需求" 时跳过提醒
+3. 类型为空时，通过关键词辅助判断
+
+**关键词列表：**
+```python
+NEED_KEYWORDS = ['需求', '建议', '优化', '改进', '新增', '增加', '功能', '想要', '希望', '能否']
+```
+
+### 处理状态范围
+**参与超时提醒的状态：**
+- 待处理
+- 处理中
+- 紧急处理中（2026-03-23 新增）
+
+**注意**：不要私自新增处理状态，新增需经 Boss 确认
+
+---
+
+## 时间戳记录规范（2026-03-23 更新 - 铁律）
+
+### 必须使用消息原始时间
+**规则：记录反馈时间时，必须使用消息的 `create_time`，不能使用当前时间**
+
+**错误做法：**
+```python
+# ❌ 错误：使用当前时间
+fields["反馈时间"] = int(time.time() * 1000)
+```
+
+**正确做法：**
+```python
+# ✅ 正确：使用消息原始时间
+message_time = event.get('create_time', '')  # 秒级时间戳
+feedback_timestamp = int(message_time) * 1000  # 转为毫秒
+fields["反馈时间"] = feedback_timestamp
+```
+
+### 防御性检查
+**规则：写入前必须验证时间戳合理性**
+
+```python
+def validate_feedback_timestamp(ts):
+    """验证反馈时间戳"""
+    if not ts or ts <= 0:
+        return False, "时间戳为空或无效"
+    
+    now = int(time.time() * 1000)
+    thirty_days_ago = now - (30 * 24 * 60 * 60 * 1000)
+    
+    if ts > now:
+        return False, "时间戳在未来"
+    if ts < thirty_days_ago:
+        return False, "时间戳超过30天前"
+    
+    return True, "有效"
+```
+
+### 写入后验证
+**规则：创建记录后必须读取验证关键字段**
+
+```python
+# 创建记录后验证
+record_result = record_to_bitable(...)
+if record_result.get('code') == 0:
+    created_fields = record_result.get('data', {}).get('record', {}).get('fields', {})
+    created_feedback_time = created_fields.get('反馈时间')
+    if created_feedback_time is None or created_feedback_time == 0:
+        print(f"⚠️ [验证失败] 反馈时间为空！record_id={record_id}")
+```
+
+---
+
+## 重复检测规则（2026-03-23 新增 - 铁律）
+
+### 核心原则
+**规则：同一问题的补充信息应该更新原记录，而非创建新记录**
+
+### 相似度计算维度
+| 维度 | 权重 | 匹配规则 |
+|------|------|----------|
+| 订单号 | 100% | 任意共同订单号 → 视为同一问题 |
+| 手机号 | 100% | 任意共同手机号 → 视为同一问题 |
+| 产品关键词 | 50% | 共同产品词 / 总产品词 |
+| 地点关键词 | 30% | 共同地点词 / 总地点词 |
+| 文本相似度 | 20% | 字符交集 / 字符并集 |
+
+### 阈值设置
+- **完全重复**：相似度 > 95% → 直接返回已有记录
+- **高度相似**：相似度 60%-95% → 更新原记录追加补充
+- **新问题**：相似度 < 60% → 创建新记录
+
+### 更新策略
+```python
+# 找到相似记录后，更新而非创建
+similar_record_id = find_similar_record(content, ...)
+if similar_record_id:
+    update_record_with_supplement(
+        record_id=similar_record_id,
+        new_content=content,
+        new_reporter=reporter,
+        ...
+    )
+else:
+    # 创建新记录
+    create_new_record(...)
+```
+
+### 补充信息格式
+```
+原问题内容
+
+--- 补充 (2026-03-23 11:50) ---
+新的补充信息
+
+--- 补充 (2026-03-23 14:30) ---
+第二次补充信息
+```
+
+---
+
+## 需求跟进系统规则（2026-03-23 新增）
+
+### 系统概述
+完整的从需求捕获到 PRD 生成的跟进流程系统
+
+### 核心流程
+```
+触发指令("跟进这个需求") 
+  → 重复检测(85%阈值)
+  → 创建需求记录(状态:待跟进)
+  → 创建调研群
+  → 添加成员(需求方+Boss)
+  → 发送引导消息
+  → 监控群消息
+  → 生成PRD
+  → 完成跟进(状态:已完成)
+```
+
+### 触发词配置
+| 阶段 | 触发词 | 说明 |
+|------|--------|------|
+| 启动跟进 | "跟进这个需求", "跟进需求", "记录这个需求" | Boss 引用消息后触发 |
+| 执行调研 | "开始调研", "开始分析", "调研一下" | 在调研群触发 |
+| 生成 PRD | "生成PRD", "完成调研", "写需求文档", "写PRD" | 调研完成后触发 |
+| 取消需求 | "取消", "不做了", "暂停" | 取消当前跟进 |
+
+### 群名称规则
+```
+需求调研-{需求方姓名}-{MMDD}
+# 示例：需求调研-张三-0323
+```
+
+### PRD 文档规范
+- **保存路径**: `docs/prd/requirement-{record_id}.md`
+- **文档格式**: Markdown
+- **必含章节**: 需求信息、需求描述、调研补充、背景、目标、方案、验收标准
+- **生成工具**: 使用 `prd-document` skill
+
+---
+
+## Post 消息格式规范（2026-03-23 更新 - 铁律）
+
+### 正确格式
+```python
+content = {
+    "zh_cn": {
+        "title": "标题",
+        "content": [
+            # 每行独立元素
+            [{"tag": "text", "text": "第一行内容"}],
+            [{"tag": "text", "text": "第二行内容"}],
+            # @ 高亮
+            [{"tag": "at", "user_id": "ou_xxx", "user_name": "张三"}]
+        ]
+    }
+}
+```
+
+### 禁止事项
+- ❌ 使用 `\n` 换行：`{"tag": "text", "text": "line1\nline2"}`
+- ❌ 使用 style 属性：`{"style": {"bold": True}}`（API 不稳定）
+- ❌ 纯文本 @：`{"tag": "text", "text": "@张三"}`（不会高亮）
+
+---
+
+*最后更新：2026-03-23*
