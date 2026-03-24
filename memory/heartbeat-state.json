@@ -124,6 +124,55 @@
   "warnings": [],
   "security_audit_date": "2026-03-19",
   "next_check": "2026-03-26T22:44:00+08:00",
+  "config_check": {
+    "last_check": "2026-03-24T08:51:00+08:00",
+    "check_type": "tuesday_config_drift",
+    "overall_status": "PASSED",
+    "config_files_checked": [
+      {
+        "file": ".feishu_bitable_config.json",
+        "status": "OK",
+        "size": 201,
+        "modified": "2026-03-17",
+        "drift_detected": false
+      },
+      {
+        "file": "feishu_contacts.json",
+        "status": "OK",
+        "size": 3691,
+        "modified": "2026-03-18",
+        "contacts_count": 21,
+        "drift_detected": false
+      },
+      {
+        "file": ".env",
+        "status": "OK",
+        "size": 100,
+        "modified": "2026-03-20",
+        "has_api_key": true,
+        "drift_detected": false
+      },
+      {
+        "file": "package.json",
+        "status": "OK",
+        "size": 49,
+        "modified": "2026-03-15",
+        "drift_detected": false
+      },
+      {
+        "file": ".openclaw/workspace-state.json",
+        "status": "OK",
+        "bootstrap": "2026-03-10",
+        "onboarding": "2026-03-13",
+        "drift_detected": false
+      }
+    ],
+    "findings": {
+      "expected_vs_actual": "配置一致，无漂移",
+      "unauthorized_changes": "未检测到未授权变更"
+    },
+    "requires_attention": false
+  },
   "weekly_summary": {
     "last_check": "2026-03-20T18:13:00+08:00",
     "check_type": "friday_weekly_summary",

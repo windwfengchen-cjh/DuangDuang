@@ -129,6 +129,65 @@ def parse_datetime(value):
                 continue
     return None
 
+
+def should_send_severe_reminder(fields):
+    """判断是否应该发送严重超时提醒（每3小时提醒1次）"""
+    last_reminder_time = fields.get('上次提醒时间', None)
+    
+    if not last_reminder_time:
+        # 从未提醒过，应该提醒
+        return True
+    
+    last_dt = parse_datetime(last_reminder_time)
+    if not last_dt:
+        return True
+    
+    now = datetime.now()
+    elapsed = now - last_dt
+    
+    # 3小时 = 3 * 60 * 60 秒
+    return elapsed.total_seconds() >= 3 * 60 * 60
+
+
+def update_last_reminder_time(record_id):
+    """更新记录的上次提醒时间为当前时间"""
+    app_id, app_secret = load_feishu_creds()
+    if not app_id or not app_secret:
+        return False
+    
+    token = get_tenant_access_token(app_id, app_secret)
+    
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    
+    now = datetime.now()
+    # 飞书DateTime字段格式：毫秒级时间戳
+    timestamp_ms = int(now.timestamp() * 1000)
+    
+    url = f"https://open.feishu.cn/open-apis/bitable/v1/apps/{BITABLE_APP_TOKEN}/tables/{BITABLE_TABLE_ID}/records/{record_id}"
+    payload = {
+        "fields": {
+            "上次提醒时间": timestamp_ms
+        }
+    }
+    
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'},
+        method='PUT'
+    )
+    
+    try:
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
+            result = json.loads(response.read().decode('utf-8'))
+            return result.get('code') == 0
+    except Exception as e:
+        print(f"更新上次提醒时间失败: {e}")
+        return False
+
 def is_need_type(fields):
     """判断是否是需求/建议类 - 优先使用「类型」字段"""
     # 优先使用表格的「类型」字段（单选：问题/需求）
@@ -149,11 +208,12 @@ def find_overdue_issues_1h(records):
     """找出超过1小时未处理的Bug/问题（需求类不提醒）"""
     now = datetime.now()
     overdue = []
-    
+
     for record in records:
         fields = record.get('fields', {})
         status = fields.get('处理状态', '')
-        if status not in ['待处理']:
+        # 注意：不要私自新增处理状态，新增需经Boss确认
+        if status not in ['待处理', '处理中', '紧急处理中']:
             continue
         
         feedback_time = fields.get('反馈时间', '')
@@ -180,22 +240,29 @@ def find_overdue_issues_1h(records):
     return overdue
 
 def find_overdue_issues_3d(records):
-    """找出超过3天未处理的反馈（包括问题和需求，私聊提醒主人）"""
+    """找出超过3天未处理的问题（需求不提醒，仅问题和待处理/处理中/紧急处理中状态）"""
     now = datetime.now()
     threshold = timedelta(days=3)
     overdue = []
-    
+
     for record in records:
         fields = record.get('fields', {})
         status = fields.get('处理状态', '')
-        if status not in ['待处理', '处理中']:
+
+        # 规则：只处理"待处理"、"处理中"、"紧急处理中"状态
+        # 注意：不要私自新增处理状态，新增需经Boss确认
+        if status not in ['待处理', '处理中', '紧急处理中']:
             continue
-        
+
+        # 规则：需求类型不需要严重超时提醒
+        if is_need_type(fields):
+            continue
+
         feedback_time = fields.get('反馈时间', '')
         dt = parse_datetime(feedback_time)
         if not dt:
             continue
-        
+
         elapsed = now - dt
         if elapsed >= threshold:
             record_type = fields.get('类型', '问题')
@@ -211,50 +278,96 @@ def find_overdue_issues_3d(records):
                 '已超时': f"{elapsed.days}天 {elapsed.seconds // 3600}小时",
                 'elapsed_days': elapsed.days
             })
-    
+
     overdue.sort(key=lambda x: x['elapsed_days'], reverse=True)
     return overdue
 
-def send_reminder_chat(issues):
-    """在目标群发送1小时催促消息"""
+def send_reminder_chat(issues, is_3day=False):
+    """在目标群发送催促消息
+
+    Args:
+        issues: 问题列表
+        is_3day: 是否为3天超时提醒（默认False表示1小时提醒）
+    """
     app_id, app_secret = load_feishu_creds()
     if not app_id or not app_secret:
         return False
-    
+
     token = get_tenant_access_token(app_id, app_secret)
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
-    
-    lines = [f"⏰ **问题超时提醒**", "", f"以下问题已超过1小时未处理，请尽快响应：", ""]
+
+    content_blocks = []
+
+    # 标题行（注意：飞书Post消息的style属性有问题，暂时不用加粗）
+    if is_3day:
+        content_blocks.append([{"tag": "text", "text": "🚨 严重超时提醒（超过3天）"}])
+    else:
+        content_blocks.append([{"tag": "text", "text": "⏰ 问题超时提醒"}])
+
+    content_blocks.append([{"tag": "text", "text": ""}])
+
+    if is_3day:
+        content_blocks.append([{"tag": "text", "text": "以下问题已严重超时，请优先处理："}])
+    else:
+        content_blocks.append([{"tag": "text", "text": "以下问题已超过1小时未处理，请尽快响应："}])
+
+    content_blocks.append([{"tag": "text", "text": ""}])
+
     for i, issue in enumerate(issues, 1):
-        lines.append(f"{i}. **{issue['问题简述']}**")
-        lines.append(f"   反馈人：{issue['反馈人']} | 来源：{issue['反馈来源']}")
-        lines.append(f"   时间：{issue['反馈时间']}（已超时 {issue['已超时']}）")
-        lines.append("")
-    
-    content_blocks = [[{"tag": "text", "text": "\n".join(lines)}]]
+        # 问题标题
+        content_blocks.append([{"tag": "text", "text": f"{i}. {issue['问题简述']}"}])
+
+        if is_3day:
+            content_blocks.append([{
+                "tag": "text",
+                "text": f"   状态：{issue.get('处理状态', '未知')} | 反馈人：{issue['反馈人']}"
+            }])
+            # 超时时间高亮显示（用【】代替加粗）
+            content_blocks.append([
+                {"tag": "text", "text": f"   时间：{issue['反馈时间']}（已超时【{issue['已超时']}】）"}
+            ])
+        else:
+            content_blocks.append([{
+                "tag": "text",
+                "text": f"   反馈人：{issue['反馈人']} | 来源：{issue['反馈来源']}"
+            }])
+            content_blocks.append([{
+                "tag": "text",
+                "text": f"   时间：{issue['反馈时间']}（已超时 {issue['已超时']}）"
+            }])
+
+        content_blocks.append([{"tag": "text", "text": ""}])
+
+    # @处理人
     at_paragraph = [{"tag": "text", "text": "请处理："}]
     for handler in HANDLERS:
         at_paragraph.append({"tag": "at", "user_id": handler["user_id"], "user_name": handler["user_name"]})
         at_paragraph.append({"tag": "text", "text": " "})
     content_blocks.append(at_paragraph)
-    
-    message_content = {"zh_cn": {"title": "⏰ 问题超时提醒", "content": content_blocks}}
-    
+
+    title = "🚨 严重超时提醒（超过3天）" if is_3day else "⏰ 问题超时提醒"
+    message_content = {"zh_cn": {"title": title, "content": content_blocks}}
+
     url = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id"
     payload = {
         "receive_id": TARGET_CHAT_ID,
         "msg_type": "post",
         "content": json.dumps(message_content, ensure_ascii=False)
     }
-    
+
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}, method='POST')
-    
+
     try:
         with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
             result = json.loads(response.read().decode('utf-8'))
+            # 检查是否有 mentions 字段（@高亮成功的标志）
+            if result.get('code') == 0:
+                body = result.get('data', {})
+                if 'mentions' not in body:
+                    print(f"警告：消息发送成功，但未返回 mentions 字段，@可能未高亮")
             return result.get('code') == 0
     except Exception as e:
         print(f"发送异常: {e}")
@@ -323,24 +436,45 @@ def send_private_reminder_to_master(issues):
 
 def main():
     print(f"[{datetime.now()}] 开始检查超时问题...")
-    
+
     records = get_pending_records()
     print(f"共获取 {len(records)} 条记录")
     
-    # 1. 检查1小时超时（群提醒）
+    # 构建记录字典，便于后续查询
+    records_dict = {r['record_id']: r for r in records}
+
+    # 1. 检查1小时超时（群提醒）- 处理中/待处理，超过1小时但不到3天
     overdue_1h = find_overdue_issues_1h(records)
     print(f"发现 {len(overdue_1h)} 条超过1小时未处理的Bug/问题")
     if overdue_1h:
-        success = send_reminder_chat(overdue_1h)
+        success = send_reminder_chat(overdue_1h, is_3day=False)
         print(f"[{datetime.now()}] 1小时群提醒发送{'成功' if success else '失败'}")
-    
-    # 2. 检查3天超时（私聊提醒主人）
+
+    # 2. 检查3天超时（群提醒 + 私聊提醒主人）- 处理中/待处理，超过3天
+    # 修改为：每3小时提醒1次（通过"上次提醒时间"字段控制）
     overdue_3d = find_overdue_issues_3d(records)
-    print(f"发现 {len(overdue_3d)} 条超过3天未处理的反馈")
-    if overdue_3d:
-        success = send_private_reminder_to_master(overdue_3d)
-        print(f"[{datetime.now()}] 3天私聊提醒发送{'成功' if success else '失败'}")
     
+    # 过滤出需要提醒的（距上次提醒已超过3小时或从未提醒）
+    need_remind_3d = [issue for issue in overdue_3d 
+                      if should_send_severe_reminder(records_dict.get(issue['record_id'], {}).get('fields', {}))]
+    
+    print(f"发现 {len(overdue_3d)} 条超过3天未处理的反馈，其中 {len(need_remind_3d)} 条需要提醒（已满足3小时间隔）")
+    
+    if need_remind_3d:
+        # 2.1 先发群提醒
+        success_chat = send_reminder_chat(need_remind_3d, is_3day=True)
+        print(f"[{datetime.now()}] 3天群提醒发送{'成功' if success_chat else '失败'}")
+        
+        # 2.2 再发私聊提醒
+        success_private = send_private_reminder_to_master(need_remind_3d)
+        print(f"[{datetime.now()}] 3天私聊提醒发送{'成功' if success_private else '失败'}")
+        
+        # 2.3 更新提醒时间（发送成功后）
+        if success_chat or success_private:
+            for issue in need_remind_3d:
+                update_last_reminder_time(issue['record_id'])
+                print(f"  已更新记录 {issue['record_id'][:8]}... 的上次提醒时间")
+
     print(f"[{datetime.now()}] 检查完成")
 
 if __name__ == '__main__':

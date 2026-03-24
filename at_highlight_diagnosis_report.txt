@@ -1,0 +1,69 @@
+================================================================================
+【@人高亮问题 - 完整诊断报告】
+================================================================================
+
+1. 代码路径分析
+----------------------------------------
+   ✅ workspace Python: /home/admin/openclaw/workspace/auto_forward.py
+   ✅ skill Python: /home/admin/.openclaw/skills/feishu-feedback-handler/scripts/auto_forward.py
+   ✅ skill TypeScript 源码: /home/admin/.openclaw/skills/feishu-feedback-handler/src/forwarder.ts
+   ✅ skill TypeScript 编译后: /home/admin/.openclaw/skills/feishu-feedback-handler/dist/forwarder.js
+   ✅ 需求跟进 Python: /home/admin/openclaw/workspace/requirement_follow.py
+
+2. 消息格式检查
+----------------------------------------
+   ✅ workspace/auto_forward.py: msg_type='post', ensure_ascii=False 正确
+   ✅ skill/auto_forward.py: msg_type='post', ensure_ascii=False 正确
+   ✅ skill/forwarder.js: msg_type='post' 正确
+   ✅ requirement_follow.py: 部分ensure_ascii=False正确
+   ⚠️ requirement_follow.py: 发现缺少ensure_ascii=False的json.dumps调用
+
+3. Handler配置检查
+----------------------------------------
+   Skill Config handlers:
+     - 产研-融合业务组 (oc_469678cc3cd264438f9bbb65da534c0b):
+       ✅ 施嘉科: ou_82e152d737ab5aedee7110066828b5a1
+       ✅ 宋广智: ou_cbcd1090961b620a4500ce68e3c81952
+     - 号卡&宽带需求和酬金系统体系搭建 (oc_3b4215cdadcc9366c863377561ce00c5):
+       ✅ 施嘉科: ou_82e152d737ab5aedee7110066828b5a1
+       ✅ 宋广智: ou_cbcd1090961b620a4500ce68e3c81952
+     - 线下号卡-信息流投放上报沟通 (oc_ee55ec5275cc158b826fe1204d75cf2c):
+       ✅ 施嘉科: ou_82e152d737ab5aedee7110066828b5a1
+     - 号卡能力中心信息同频群 (oc_5bf7336955740fb41ba59e4e929c5239):
+       ✅ 施嘉科: ou_82e152d737ab5aedee7110066828b5a1
+       ✅ 郑武友: ou_834914563c797190697ca36b074a6952
+     - 待补充（新来源群） (oc_59539a59e696491bd93241ecd9b8c80d):
+       ✅ 施嘉科: ou_82e152d737ab5aedee7110066828b5a1
+       ✅ 乔梦歌: ou_e5f4eb9c08a5d6abe2e4b568e07907f0
+     - 待补充新群 (oc_af98aab591a25fca68718cfb7c436385):
+       ✅ 施嘉科: ou_82e152d737ab5aedee7110066828b5a1
+       ✅ 宋广智: ou_cbcd1090961b620a4500ce68e3c81952
+       ✅ 李川平: ou_e0b3221ff687bea25dd88257dbbb30d4
+       ✅ 王凯明: ou_d68b02946c960929136849be2c8be50f
+
+4. 已发现和修复的问题
+----------------------------------------
+   问题1: requirement_follow.py中的两处json.dumps缺少ensure_ascii=False
+     - 位置1: send_invite_links函数 (约第528行)
+     - 位置2: send_welcome_message函数 (约第569行)
+     - 影响: 中文字符被转义为\uXXXX格式，可能影响@高亮
+     - 状态: ✅ 已修复
+
+5. 可能的其他原因
+----------------------------------------
+   如果修复后@仍不高亮，可能原因：
+   a) 飞书机器人没有@这些人的权限
+   b) 被@的人不在目标群中
+   c) user_id不正确（不是有效的open_id）
+   d) 飞书API对@高亮有其他隐藏要求
+   e) 实际运行的是其他未检查的代码路径
+
+6. 建议的调试步骤
+----------------------------------------
+   1. 重新部署修复后的requirement_follow.py
+   2. 在发送消息前添加调试日志，打印实际发送的消息内容
+   3. 检查飞书机器人是否有@相关人员的权限
+   4. 尝试使用飞书API测试工具直接发送测试消息
+   5. 确认被@的人都在目标群中
+
+================================================================================
