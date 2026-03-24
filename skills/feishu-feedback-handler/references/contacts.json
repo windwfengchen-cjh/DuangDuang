@@ -1,0 +1,111 @@
+{
+  "ou_3e48baef1bd71cc89fb5a364be55cafc": {
+    "name": "陈俊洪",
+    "role": "Boss",
+    "description": "产品经理"
+  },
+  "ou_82e152d737ab5aedee7110066828b5a1": {
+    "name": "施嘉科",
+    "role": "处理人",
+    "description": "开发负责人"
+  },
+  "ou_cbcd1090961b620a4500ce68e3c81952": {
+    "name": "宋广智",
+    "role": "处理人",
+    "description": "开发工程师"
+  },
+  "ou_834914563c797190697ca36b074a6952": {
+    "name": "郑武友",
+    "role": "处理人",
+    "description": "配置4处理人"
+  },
+  "ou_e0b3221ff687bea25dd88257dbbb30d4": {
+    "name": "李川平",
+    "role": "处理人",
+    "description": "开发工程师"
+  },
+  "ou_d03303783b5538c608b540dc8ad9ac87": {
+    "name": "梁思洁",
+    "role": "反馈人",
+    "description": "产研-融合业务组成员",
+    "source": "产研-融合业务组"
+  },
+  "ou_6b9602a545a87cae83e2ca4bf9c0392e": {
+    "name": "廖胡凯",
+    "role": "产研同事",
+    "description": "产研-融合业务组成员",
+    "source": "产研-融合业务组"
+  },
+  "ou_a12393c3d0b70a7bfa7f7d1968f1b9c9": {
+    "name": "许宗达",
+    "role": "反馈人",
+    "description": "号卡能力中心信息同频群成员",
+    "source": "号卡能力中心信息同频群"
+  },
+  "ou_95cb729324894f5e928847f516b7bd16": {
+    "name": "黄明霞",
+    "role": "反馈人",
+    "description": "号卡能力中心信息同频群成员",
+    "source": "号卡能力中心信息同频群"
+  },
+  "ou_0fd5c6871976be1c5da80be2ad0add14": {
+    "name": "谭骏",
+    "role": "反馈人",
+    "description": "号卡能力中心信息同频群成员",
+    "source": "号卡能力中心信息同频群"
+  },
+  "ou_aec7f0cc098ebd029797344cfe8baf0c": {
+    "name": "苏键伟",
+    "role": "反馈人",
+    "description": "号卡能力中心信息同频群成员",
+    "source": "号卡能力中心信息同频群"
+  },
+  "ou_94894c0b10f8744f1d1a1b66d25a2fc2": {
+    "name": "秦鑫",
+    "role": "反馈人",
+    "description": "号卡能力中心信息同频群成员",
+    "source": "号卡能力中心信息同频群"
+  },
+  "ou_b536efa2e3b7bd6e17cf16dbaeab5504": {
+    "name": "陈美程",
+    "role": "反馈人",
+    "description": "号卡能力中心信息同频群成员",
+    "source": "号卡能力中心信息同频群"
+  },
+  "ou_44852da82a22c7d97354dedb84fd021c": {
+    "name": "严欣欣",
+    "role": "反馈人",
+    "description": "号卡能力中心信息同频群成员",
+    "source": "号卡能力中心信息同频群"
+  },
+  "ou_8e345cfadc3faac8bef65129c7d04ad6": {
+    "name": "曹敏",
+    "role": "反馈人",
+    "description": "号卡破解产研沟通群成员",
+    "source": "号卡破解产研沟通群"
+  },
+  "ou_7e1424dfd5f44af02aa6d486ab255f5d": {
+    "name": "梁显光",
+    "role": "反馈人",
+    "description": "号卡能力中心信息同频群成员",
+    "source": "号卡能力中心信息同频群"
+  },
+  "ou_4f6de7b3b2b8d6dca7ee48d73869aa14": {
+    "name": "黄炯壕",
+    "role": "反馈人",
+    "description": "号卡能力中心信息同频群成员",
+    "source": "号卡能力中心信息同频群"
+  },
+  "ou_a41f4c2c7b005523668988a9bfd2d778": {
+    "name": "杨政航",
+    "role": "反馈人",
+    "description": "号卡破解产研沟通群成员",
+    "source": "号卡破解产研沟通群"
+  },
+  "ou_4cff36de5332eed5b8ec28a45857aec0": {
+    "name": "陈伟军",
+    "role": "反馈人",
+    "description": "号卡破解产研沟通群成员",
+    "source": "号卡破解产研沟通群"
+  }
+}
