@@ -58,8 +58,17 @@ export declare class FeedbackHandler {
     private isFollowUpCommand;
     /**
      * 处理需求跟进指令
+     * 创建调研群并开始收集需求信息
      */
     private handleRequirementFollow;
+    /**
+     * 创建调研群
+     */
+    private createResearchChat;
+    /**
+     * 发送调研群邀请给Boss
+     */
+    private sendResearchGroupInvite;
     /**
      * 处理跟进指令
      */

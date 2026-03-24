@@ -7,7 +7,13 @@ import * as path from 'path';
 import { loadConfig, ForwardConfig } from './config';
 import { Forwarder, ForwardResult, MessageType } from './forwarder';
 import { BitableClient } from './bitable';
-import { getTenantAccessToken, removeAtTags } from './utils';
+import { getTenantAccessToken, removeAtTags, sendFeishuMessage } from './utils';
+import {
+  isResearchChat,
+  handleResearchMessage,
+  createResearchSession,
+  startResearch
+} from './research';
 
 /**
  * 需求跟进触发词
@@ -26,6 +32,50 @@ const REQUIREMENT_FOLLOW_TRIGGERS = [
 function isRequirementFollowCommand(text: string): boolean {
   const lowerText = text.toLowerCase();
   return REQUIREMENT_FOLLOW_TRIGGERS.some(trigger => lowerText.includes(trigger));
+}
+
+/**
+ * 从飞书消息内容中提取纯文本
+ * 支持 text 和 post 两种消息类型
+ */
+function extractTextFromContent(content: any): string {
+  // 处理 text 类型消息
+  if (content.text) {
+    return content.text;
+  }
+
+  // 处理 post 类型消息（引用消息）
+  if (content.post) {
+    const postContent = content.post.zh_cn || content.post;
+    if (postContent) {
+      let extractedText = '';
+
+      // 提取标题
+      if (postContent.title) {
+        extractedText += postContent.title + '\n';
+      }
+
+      // 提取内容块中的文本
+      if (Array.isArray(postContent.content)) {
+        for (const block of postContent.content) {
+          if (Array.isArray(block)) {
+            for (const element of block) {
+              if (element.tag === 'text' && element.text) {
+                extractedText += element.text;
+              } else if (element.tag === 'at' && element.user_name) {
+                extractedText += `@${element.user_name}`;
+              }
+            }
+            extractedText += '\n';
+          }
+        }
+      }
+
+      return extractedText.trim();
+    }
+  }
+
+  return '';
 }
 
 /**
@@ -133,7 +183,20 @@ export class FeedbackHandler {
    */
   async handleMessage(event: FeishuMessageEvent): Promise<any> {
     console.log(`[${new Date().toISOString()}] 收到消息 from ${event.sender.sender_name || 'Unknown'}`);
-    
+
+    // 首先检查是否是调研群的消息（不需要@我）
+    const chatId = event.chat_id;
+    if (isResearchChat(chatId)) {
+      console.log(`  检测到调研群消息: ${chatId}`);
+      await this.getToken();
+      const result = await handleResearchMessage(event, this.token!);
+      if (result.handled) {
+        console.log(`  已处理调研消息: ${result.result?.action || 'unknown'}`);
+        return { type: 'research', ...result };
+      }
+      // 如果调研处理器没有处理（比如不是需求人发的消息），继续走正常流程
+    }
+
     // 检查是否@我
     if (!this.isAtMe(event)) {
       console.log('  未@我，忽略');
@@ -147,11 +210,11 @@ export class FeedbackHandler {
       return { handled: false, reason: 'config_not_found', error: `未找到来源群配置: ${sourceChatId}` };
     }
 
-    // 获取纯文本内容
+    // 获取纯文本内容（支持 text 和 post 类型）
     let textContent = '';
     try {
       const content = JSON.parse(event.content);
-      textContent = content.text || '';
+      textContent = extractTextFromContent(content);
     } catch {
       textContent = event.content;
     }
@@ -201,6 +264,7 @@ export class FeedbackHandler {
 
   /**
    * 处理需求跟进指令
+   * 创建调研群并开始收集需求信息
    */
   private async handleRequirementFollow(
     event: FeishuMessageEvent,
@@ -212,68 +276,105 @@ export class FeedbackHandler {
     const sender = event.sender;
     const senderName = sender.sender_name || 'Unknown';
     const senderId = sender.sender_id.open_id;
-    const chatId = event.chat_id;
-    const messageId = event.message_id;
-    const createTime = event.create_time;
+    const sourceChatId = event.chat_id;
 
     try {
-      // 调用 requirement_follow.py 启动需求跟进流程
-      const { spawn } = require('child_process');
-      const path = require('path');
+      // 从消息中提取需求标题（如果有引用的消息）
+      let requirementTitle = '新需求';
+      try {
+        const content = JSON.parse(event.content);
+        if (content.post?.zh_cn?.title) {
+          requirementTitle = content.post.zh_cn.title;
+        } else if (content.text) {
+          // 尝试从文本中提取需求标题
+          const cleanText = removeAtTags(content.text);
+          // 取第一行或前30个字符作为标题
+          requirementTitle = cleanText.split('\n')[0].slice(0, 30) || '新需求';
+        }
+      } catch {
+        requirementTitle = '新需求';
+      }
 
-      const eventData = {
-        sender: {
-          sender_name: senderName,
-          sender_id: { open_id: senderId }
-        },
-        content: text,
-        chat_id: chatId,
-        message_id: messageId,
-        create_time: createTime
+      // 生成群名称
+      const timestamp = new Date().toISOString().slice(5, 10).replace('-', ''); // MMDD格式
+      const chatName = `[${timestamp}] ${requirementTitle} - 需求调研`;
+
+      console.log(`  📱 创建调研群: ${chatName}`);
+
+      // 创建群聊
+      const createResult = await this.createResearchChat(chatName, requirementTitle);
+      if (!createResult.success) {
+        return {
+          handled: true,
+          type: 'requirement_follow',
+          success: false,
+          error: createResult.error || '创建群聊失败'
+        };
+      }
+
+      const researchChatId = createResult.chat_id!;
+
+      // 创建调研会话状态
+      createResearchSession(
+        researchChatId,
+        requirementTitle,
+        senderId,
+        senderName,
+        this.config.boss.user_id
+      );
+
+      console.log(`  ✅ 调研会话已创建: ${researchChatId}`);
+
+      // 发送群邀请给Boss
+      await this.sendResearchGroupInvite(researchChatId, requirementTitle, senderName);
+
+      // 记录到业务反馈问题记录表
+      let recordId: string | null = null;
+      try {
+        const messageTimeMs = parseInt(event.create_time) * 1000;
+        recordId = await this.bitable.createRecord({
+          title: requirementTitle,
+          feedbackTime: messageTimeMs,
+          feedbackUser: senderName,
+          feedbackSource: config.source_name,
+          content: text,
+          sourceChatId: sourceChatId,
+          type: '需求',
+          originalMessageId: event.message_id
+        });
+        console.log(`  ✅ 已记录到业务反馈表: ${recordId}`);
+      } catch (e) {
+        console.error(`  ⚠️ 记录业务反馈表失败: ${e}`);
+      }
+
+      // NEW: 记录到需求跟进清单表
+      let requirementRecordId: string | null = null;
+      try {
+        requirementRecordId = await this.bitable.createRequirementRecord({
+          requirementContent: requirementTitle,
+          requesterName: senderName,
+          requesterId: senderId,
+          sourceChatId: sourceChatId,
+          sourceChatName: config.source_name,
+          researchChatId: researchChatId,
+          researchChatName: chatName,
+          originalMessageId: event.message_id
+        });
+        console.log(`  ✅ 已记录到需求跟进清单: ${requirementRecordId}`);
+      } catch (e) {
+        console.error(`  ⚠️ 记录需求跟进清单失败: ${e}`);
+      }
+
+      return {
+        handled: true,
+        type: 'requirement_follow',
+        success: true,
+        researchChatId,
+        recordId,
+        requirementRecordId,
+        message: `已创建需求调研群并记录到需求跟进清单，请Boss将需求人拉入群聊后开始收集`
       };
 
-      return new Promise((resolve, reject) => {
-        const pythonScript = path.join('/home/admin/openclaw/workspace', 'requirement_follow.py');
-        const pythonProcess = spawn('python3', [pythonScript], {
-          cwd: '/home/admin/openclaw/workspace'
-        });
-
-        let stdout = '';
-        let stderr = '';
-
-        pythonProcess.stdout.on('data', (data: Buffer) => {
-          stdout += data.toString();
-        });
-
-        pythonProcess.stderr.on('data', (data: Buffer) => {
-          stderr += data.toString();
-        });
-
-        pythonProcess.on('close', (code: number) => {
-          if (code !== 0) {
-            console.error(`  ❌ 需求跟进脚本执行失败: ${stderr}`);
-            resolve({
-              handled: true,
-              type: 'requirement_follow',
-              success: false,
-              error: stderr || '脚本执行失败'
-            });
-          } else {
-            console.log(`  ✅ 需求跟进流程已启动`);
-            console.log(`  📤 输出: ${stdout.substring(0, 200)}...`);
-            resolve({
-              handled: true,
-              type: 'requirement_follow',
-              success: true,
-              output: stdout
-            });
-          }
-        });
-
-        // 发送事件数据到 Python 脚本
-        pythonProcess.stdin.write(JSON.stringify(eventData));
-        pythonProcess.stdin.end();
-      });
     } catch (error) {
       console.error(`  ❌ 需求跟进处理异常: ${error}`);
       return {
@@ -283,6 +384,49 @@ export class FeedbackHandler {
         error: String(error)
       };
     }
+  }
+
+  /**
+   * 创建调研群
+   */
+  private async createResearchChat(chatName: string, description: string): Promise<{ success: boolean; chat_id?: string; error?: string }> {
+    try {
+      const url = 'https://open.feishu.cn/open-apis/im/v1/chats';
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.token}`
+        },
+        body: JSON.stringify({
+          name: chatName,
+          description: `需求调研群: ${description}`,
+          chat_mode: 'group',
+          chat_type: 'public'
+        })
+      });
+
+      const data = await response.json();
+      if (data.code !== 0) {
+        console.error('创建群聊失败:', data);
+        return { success: false, error: data.msg || '创建群聊失败' };
+      }
+
+      return { success: true, chat_id: data.data.chat_id };
+    } catch (error) {
+      console.error('创建群聊异常:', error);
+      return { success: false, error: String(error) };
+    }
+  }
+
+  /**
+   * 发送调研群邀请给Boss
+   */
+  private async sendResearchGroupInvite(chatId: string, requirementTitle: string, requirementPersonName: string): Promise<void> {
+    const inviteMessage = `👋 Boss好！\n\n我已为需求「**${requirementTitle}**」（需求人：${requirementPersonName}）创建了专门的调研群。\n\n⚠️ **由于飞书机器人权限限制，我无法直接添加未授权的用户进群。**\n\n👉 **请您帮忙将需求人拉入本群**，我将在此群内收集需求信息。\n\n收集的问题清单：\n1️⃣ 业务背景\n2️⃣ 目标用户  \n3️⃣ 现状描述\n4️⃣ 核心痛点\n5️⃣ 期望解决方案\n6️⃣ 优先级和时间\n7️⃣ 相关资料\n\n需求人进群后，我会自动开始收集信息。谢谢！🙏`;
+
+    await sendFeishuMessage(chatId, inviteMessage, this.token!);
+    console.log(`  📨 群邀请已发送给Boss`);
   }
 
   /**
@@ -423,10 +567,11 @@ export class FeedbackHandler {
       return { handled: false, reason: 'not_at_me' };
     }
 
+    // 获取纯文本内容（支持 text 和 post 类型）
     let textContent = '';
     try {
       const content = JSON.parse(event.content);
-      textContent = content.text || '';
+      textContent = extractTextFromContent(content);
     } catch {
       textContent = event.content;
     }

@@ -68,6 +68,54 @@ class BitableClient {
         }
     }
     /**
+     * 创建需求跟进记录（写入需求跟进清单表）
+     */
+    async createRequirementRecord(data) {
+        if (!this.token)
+            await this.init();
+        // 需求跟进清单表的配置
+        const REQUIREMENT_APP_TOKEN = 'Op8WbbFewaq1tasfO8IcQkXmnFf';
+        const REQUIREMENT_TABLE_ID = 'tbl0vJo8gPHIeZ9y';
+        const timestampMs = Date.now();
+        const fields = {
+            '需求内容': data.requirementContent,
+            '需求状态': '待跟进',
+            '需求时间': timestampMs,
+            '来源群': data.sourceChatName,
+            '来源群ID': data.sourceChatId,
+            '需求方': data.requesterName,
+            '需求方ID': data.requesterId,
+            '调研群ID': data.researchChatId,
+            '调研群名称': data.researchChatName,
+            '原始消息ID': data.originalMessageId,
+            '需求跟进清单': `需求: ${data.requirementContent.slice(0, 30)}...`
+        };
+        const url = `https://open.feishu.cn/open-apis/bitable/v1/apps/${REQUIREMENT_APP_TOKEN}/tables/${REQUIREMENT_TABLE_ID}/records`;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ fields })
+            });
+            const result = await response.json();
+            if (result.code === 0) {
+                console.log('✅ 需求跟进记录创建成功:', result.data?.record?.record_id);
+                return result.data?.record?.record_id || null;
+            }
+            else {
+                console.error('❌ 创建需求跟进记录失败:', result);
+                return null;
+            }
+        }
+        catch (error) {
+            console.error('❌ 创建需求跟进记录异常:', error);
+            return null;
+        }
+    }
+    /**
      * 更新记录状态
      */
     async updateStatus(recordId, status, result) {

@@ -3,7 +3,7 @@
   "name": "飞书反馈处理",
   "version": "1.0.0",
   "description": "飞书跨群问题反馈自动处理系统",
-  "entry": "src/index.ts",
+  "entry": "dist/index.js",
   "commands": [
     {
       "name": "init",

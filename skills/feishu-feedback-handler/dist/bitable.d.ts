@@ -28,6 +28,19 @@ export declare class BitableClient {
      */
     createRecord(data: RecordData): Promise<string | null>;
     /**
+     * 创建需求跟进记录（写入需求跟进清单表）
+     */
+    createRequirementRecord(data: {
+        requirementContent: string;
+        requesterName: string;
+        requesterId: string;
+        sourceChatId: string;
+        sourceChatName: string;
+        researchChatId: string;
+        researchChatName: string;
+        originalMessageId: string;
+    }): Promise<string | null>;
+    /**
      * 更新记录状态
      */
     updateStatus(recordId: string, status: string, result: string): Promise<boolean>;

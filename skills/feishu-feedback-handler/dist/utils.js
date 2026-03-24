@@ -43,6 +43,8 @@ exports.extractStatusAndResult = extractStatusAndResult;
 exports.extractIssueKeywords = extractIssueKeywords;
 exports.delay = delay;
 exports.formatDate = formatDate;
+exports.sendFeishuMessage = sendFeishuMessage;
+exports.sendFeishuPostMessage = sendFeishuPostMessage;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const OPENCLAW_CONFIG = path.join(process.env.HOME || '', '.openclaw', 'openclaw.json');
@@ -204,5 +206,73 @@ function delay(ms) {
 function formatDate(timestamp) {
     const date = new Date(timestamp);
     return date.toISOString().replace('T', ' ').slice(0, 19);
+}
+/**
+ * 发送飞书文本消息
+ */
+async function sendFeishuMessage(chatId, message, token) {
+    try {
+        const url = 'https://open.feishu.cn/open-apis/im/v1/messages';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                receive_id: chatId,
+                content: JSON.stringify({ text: message }),
+                msg_type: 'text'
+            })
+        });
+        const data = await response.json();
+        if (data.code !== 0) {
+            console.error('发送消息失败:', data);
+            return false;
+        }
+        console.log(`消息发送成功: ${chatId}`);
+        return true;
+    }
+    catch (error) {
+        console.error('发送消息异常:', error);
+        return false;
+    }
+}
+/**
+ * 发送飞书富文本消息（Post类型）
+ */
+async function sendFeishuPostMessage(chatId, title, content, token) {
+    try {
+        const url = 'https://open.feishu.cn/open-apis/im/v1/messages';
+        const postContent = {
+            zh_cn: {
+                title: title,
+                content: content
+            }
+        };
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                receive_id: chatId,
+                content: JSON.stringify(postContent),
+                msg_type: 'post'
+            })
+        });
+        const data = await response.json();
+        if (data.code !== 0) {
+            console.error('发送富文本消息失败:', data);
+            return false;
+        }
+        console.log(`富文本消息发送成功: ${chatId}`);
+        return true;
+    }
+    catch (error) {
+        console.error('发送富文本消息异常:', error);
+        return false;
+    }
 }
 //# sourceMappingURL=utils.js.map
