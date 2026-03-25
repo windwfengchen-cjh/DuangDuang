@@ -1,0 +1,27 @@
+{
+  "name": "requirement-follow-skill",
+  "version": "3.0.0",
+  "description": "完整独立的需求跟进解决方案 - 整合自 requirement_follow.py",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  },
+  "keywords": [
+    "feishu",
+    "requirement",
+    "follow-up",
+    "research",
+    "prd"
+  ],
+  "author": "OpenClaw Assistant",
+  "license": "MIT"
+}

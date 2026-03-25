@@ -1,0 +1,49 @@
+{
+  "name": "requirement-follow",
+  "version": "1.0.0",
+  "description": "Standalone skill for handling requirement research group messages",
+  "entry": "src/index.ts",
+  "config": {
+    "chat_id": {
+      "type": "string",
+      "required": true,
+      "description": "Research chat group ID"
+    },
+    "requirement_id": {
+      "type": "string",
+      "required": true,
+      "description": "Requirement record ID in Bitable"
+    },
+    "requester_id": {
+      "type": "string",
+      "required": true,
+      "description": "Original requester ID"
+    },
+    "trigger_words": {
+      "type": "array",
+      "default": ["生成PRD", "完成调研", "generate_prd", "prd", "完成"],
+      "description": "Trigger words for generating PRD"
+    },
+    "timeout_hours": {
+      "type": "number",
+      "default": 24,
+      "description": "Auto-exit timeout in hours"
+    },
+    "app_token": {
+      "type": "string",
+      "required": true,
+      "description": "Bitable app token"
+    },
+    "table_id": {
+      "type": "string",
+      "required": true,
+      "description": "Bitable table ID"
+    }
+  },
+  "permissions": [
+    "message:read",
+    "message:send",
+    "feishu:read",
+    "feishu:write"
+  ]
+}

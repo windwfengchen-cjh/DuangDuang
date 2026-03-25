@@ -1,0 +1,214 @@
+{
+  "name": "feishu-feedback-handler",
+  "version": "1.3.0",
+  "description": "飞书跨群问题反馈处理系统 - 支持多群配置、消息自动转发、表格自动记录、状态自动更新、直接调用需求跟进流程",
+  "main": "src/index.ts",
+  "author": "DuangDuang",
+  "maintainer": "陈俊洪",
+  "license": "MIT",
+  "keywords": [
+    "feishu",
+    "lark",
+    "feedback",
+    "bitable",
+    "forward",
+    "automation"
+  ],
+  "categories": [
+    "productivity",
+    "automation",
+    "integration"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/feishu-feedback-handler"
+  },
+  "engines": {
+    "openclaw": ">=0.5.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^5.0.0"
+  },
+  "config": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "bitable": {
+          "type": "object",
+          "properties": {
+            "app_token": {
+              "type": "string",
+              "description": "飞书多维表格 App Token"
+            },
+            "table_id": {
+              "type": "string",
+              "description": "表格 ID"
+            }
+          },
+          "required": [
+            "app_token",
+            "table_id"
+          ]
+        },
+        "bot": {
+          "type": "object",
+          "properties": {
+            "bot_id": {
+              "type": "string",
+              "description": "机器人 Open ID"
+            }
+          },
+          "required": [
+            "bot_id"
+          ]
+        },
+        "forward_configs": {
+          "type": "object",
+          "description": "转发配置映射表，key为来源群chat_id",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "target_chat_id": {
+                "type": "string",
+                "description": "目标群chat_id"
+              },
+              "handlers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "string"
+                    },
+                    "user_name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "source_name": {
+                "type": "string",
+                "description": "来源群显示名称"
+              },
+              "record_bitable": {
+                "type": "boolean",
+                "default": true,
+                "description": "是否记录到表格"
+              },
+              "notify_boss_for_requirement": {
+                "type": "boolean",
+                "default": true,
+                "description": "需求类是否额外@Boss"
+              }
+            },
+            "required": [
+              "target_chat_id",
+              "handlers",
+              "source_name"
+            ]
+          }
+        },
+        "boss": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string"
+            },
+            "user_name": {
+              "type": "string"
+            }
+          },
+          "description": "Boss信息，需求类消息会@Boss"
+        }
+      },
+      "required": [
+        "bitable",
+        "bot",
+        "forward_configs"
+      ]
+    },
+    "default": {
+      "bitable": {
+        "app_token": "KNiibDP6KaRwopsPbRucr752ntg",
+        "table_id": "tblyDHrGGTQTaex6"
+      },
+      "bot": {
+        "bot_id": "ou_428d1d5b99e0bb6d1c26549c70688cfb"
+      },
+      "boss": {
+        "user_id": "ou_3e48baef1bd71cc89fb5a364be55cafc",
+        "user_name": "陈俊洪"
+      },
+      "forward_configs": {
+        "oc_469678cc3cd264438f9bbb65da534c0b": {
+          "target_chat_id": "oc_a016323a9fda4263ab5a27976065088e",
+          "handlers": [
+            {
+              "user_id": "ou_82e152d737ab5aedee7110066828b5a1",
+              "user_name": "施嘉科"
+            },
+            {
+              "user_id": "ou_cbcd1090961b620a4500ce68e3c81952",
+              "user_name": "宋广智"
+            }
+          ],
+          "source_name": "产研-融合业务组",
+          "record_bitable": true,
+          "notify_boss_for_requirement": true
+        },
+        "oc_3b4215cdadcc9366c863377561ce00c5": {
+          "target_chat_id": "oc_a016323a9fda4263ab5a27976065088e",
+          "handlers": [
+            {
+              "user_id": "ou_82e152d737ab5aedee7110066828b5a1",
+              "user_name": "施嘉科"
+            },
+            {
+              "user_id": "ou_cbcd1090961b620a4500ce68e3c81952",
+              "user_name": "宋广智"
+            }
+          ],
+          "source_name": "号卡&宽带需求和酬金系统体系搭建",
+          "record_bitable": true,
+          "notify_boss_for_requirement": true
+        },
+        "oc_ee55ec5275cc158b826fe1204d75cf2c": {
+          "target_chat_id": "oc_a016323a9fda4263ab5a27976065088e",
+          "handlers": [
+            {
+              "user_id": "ou_82e152d737ab5aedee7110066828b5a1",
+              "user_name": "施嘉科"
+            }
+          ],
+          "source_name": "线下号卡-信息流投放上报沟通",
+          "record_bitable": true,
+          "notify_boss_for_requirement": true
+        },
+        "oc_5bf7336955740fb41ba59e4e929c5239": {
+          "target_chat_id": "oc_cf3c4adafb332df5988b20204c272dbb",
+          "handlers": [
+            {
+              "user_id": "ou_82e152d737ab5aedee7110066828b5a1",
+              "user_name": "施嘉科"
+            },
+            {
+              "user_id": "ou_834914563c797190697ca36b074a6952",
+              "user_name": "郑武友"
+            }
+          ],
+          "source_name": "号卡能力中心信息同频群",
+          "record_bitable": true,
+          "notify_boss_for_requirement": true
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "axios": "^1.13.6"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "_comment": "需求跟进 Skill 配置 - 请根据实际情况修改",
+  "name": "requirement-follow",
+  "version": "1.0.0",
+  "description": "Standalone skill for handling requirement research group messages",
+  "entry": "src/index.ts",
+  "config": {
+    "chat_id": {
+      "type": "string",
+      "required": true,
+      "description": "Research chat group ID (调研群ID)"
+    },
+    "requirement_id": {
+      "type": "string",
+      "required": true,
+      "description": "Requirement record ID in Bitable (需求记录ID)"
+    },
+    "requester_id": {
+      "type": "string",
+      "required": true,
+      "description": "Original requester ID (需求方用户ID)"
+    },
+    "trigger_words": {
+      "type": "array",
+      "default": ["生成PRD", "完成调研", "generate_prd", "prd", "完成"],
+      "description": "Trigger words for generating PRD (PRD生成触发词)"
+    },
+    "timeout_hours": {
+      "type": "number",
+      "default": 24,
+      "description": "Auto-exit timeout in hours (自动超时时间，小时)"
+    },
+    "app_token": {
+      "type": "string",
+      "required": true,
+      "description": "Bitable app token (多维表格 App Token)"
+    },
+    "table_id": {
+      "type": "string",
+      "required": true,
+      "description": "Bitable table ID (需求跟进清单表ID)"
+    }
+  },
+  "permissions": [
+    "message:read",
+    "message:send",
+    "feishu:read",
+    "feishu:write"
+  ]
+}
