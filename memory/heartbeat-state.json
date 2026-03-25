@@ -1,7 +1,13 @@
 {
-  "check_time": "2026-03-20T09:47:00+08:00",
-  "check_type": "weekly_summary",
+  "check_time": "2026-03-25T11:07:00+08:00",
+  "check_type": "wednesday_memory_maintenance",
   "overall_status": "PASSED",
+  "lastChecks": {
+    "session": "2026-03-16",
+    "config": "2026-03-24",
+    "memory": "2026-03-25",
+    "security": "2026-03-19"
+  },
   "installed_skills": [
     {
       "name": "summarize",

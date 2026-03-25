@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 """
-需求跟进系统 - 核心实现
+⚠️  DEPRECATED - 此文件已弃用 ⚠️
+
+该功能已完全整合到 requirement-follow TypeScript skill 中。
+请使用: ~/.openclaw/skills/requirement-follow/src/index.ts
+
+弃用日期: 2024-03-24
+替代方案: RequirementFollowWorkflow 类 (requirement-follow skill v3.0.0+)
+
+原功能保留此文件仅作参考，不再维护。
+
+---
+需求跟进系统 - 核心实现 (已弃用)
 """
 
 import json
@@ -144,7 +155,8 @@ def create_requirement_record(event: Dict[str, Any], token: str, app_token: str,
         return None
 
 def create_research_chat(requirement_id: str, requirement_content: str,
-                         requester_name: str, token: str) -> Optional[Dict]:
+                         requester_name: str, token: str,
+                         members: List[str] = None) -> Optional[Dict]:
     print(f"👥 创建需求调研群...")
 
     today = datetime.now().strftime("%m%d")
@@ -159,7 +171,8 @@ def create_research_chat(requirement_id: str, requirement_content: str,
         "name": chat_name,
         "description": description,
         "chat_mode": "group",
-        "chat_type": "private"  # 租户限制：不允许创建 public 群
+        "chat_type": "private",  # 租户限制：不允许创建 public 群
+        "user_id_list": members if members else []
     }
 
     print(f"   群名称: {chat_name}")
@@ -177,7 +190,7 @@ def create_research_chat(requirement_id: str, requirement_content: str,
 
             # 群创建后等待一下，确保群完全创建完成
             print(f"   等待群初始化完成...")
-            time.sleep(2)
+            time.sleep(3)
 
             return {'chat_id': chat_id, 'chat_name': chat_name}
         else:
@@ -195,6 +208,154 @@ def create_research_chat(requirement_id: str, requirement_content: str,
         import traceback
         print(f"   堆栈: {traceback.format_exc()}")
         return None
+
+
+def check_and_validate_chat_members(chat_id: str, expected_members: List[str], token: str,
+                                     auto_disband_on_empty: bool = True) -> Dict[str, Any]:
+    """
+    检查群成员数量，如果发现成员为0则自动解散群
+
+    Args:
+        chat_id: 群ID
+        expected_members: 预期要添加的成员列表
+        token: API token
+        auto_disband_on_empty: 如果成员为0是否自动解散群
+
+    Returns:
+        {
+            "valid": bool,  # 群是否有效（成员>0）
+            "member_count": int,  # 当前成员数
+            "expected_count": int,  # 预期成员数
+            "disbanded": bool,  # 是否已解散
+            "error": str  # 错误信息
+        }
+    """
+    print(f"🔍 检查群成员状态...")
+    print(f"   群ID: {chat_id}")
+
+    result = {
+        "valid": False,
+        "member_count": 0,
+        "expected_count": len(expected_members),
+        "disbanded": False,
+        "error": None
+    }
+
+    # 获取当前群成员
+    member_ids = get_chat_members(chat_id, token)
+    member_count = len(member_ids)
+    result["member_count"] = member_count
+
+    print(f"   当前成员数: {member_count}")
+    print(f"   预期成员数: {len(expected_members)}")
+
+    if member_count == 0:
+        result["error"] = "群成员数量为0，群创建失败"
+        print(f"❌ {result['error']}")
+
+        if auto_disband_on_empty:
+            print(f"🗑️ 正在解散空群...")
+            if disband_chat(chat_id, token):
+                result["disbanded"] = True
+                print(f"✅ 空群已解散")
+            else:
+                print(f"⚠️ 解散群失败，请手动处理")
+
+        return result
+
+    # 成员数>0，群有效
+    result["valid"] = True
+    print(f"✅ 群成员检查通过")
+
+    # 检查预期成员是否都在群中
+    if expected_members:
+        missing_members = [uid for uid in expected_members if uid not in member_ids]
+        if missing_members:
+            print(f"⚠️ 以下预期成员不在群中: {missing_members}")
+        else:
+            print(f"✅ 所有预期成员都在群中")
+
+    return result
+
+
+def create_research_chat_with_retry(requirement_id: str, requirement_content: str,
+                                    requester_name: str, token: str,
+                                    members: List[str] = None,
+                                    max_retries: int = 2) -> Optional[Dict]:
+    """
+    创建需求调研群，带重试机制和成员验证
+
+    Args:
+        requirement_id: 需求记录ID
+        requirement_content: 需求内容
+        requester_name: 需求方名称
+        token: API token
+        members: 初始成员列表
+        max_retries: 最大重试次数
+
+    Returns:
+        群信息字典 或 None（如果创建失败）
+    """
+    print(f"🔄 创建调研群（带重试机制，最多{max_retries}次）...")
+
+    last_error = None
+
+    for attempt in range(1, max_retries + 1):
+        print(f"\n{'='*60}")
+        print(f"📝 第 {attempt}/{max_retries} 次尝试创建群...")
+        print(f"{'='*60}")
+
+        # 创建群
+        chat_info = create_research_chat(
+            requirement_id=requirement_id,
+            requirement_content=requirement_content,
+            requester_name=requester_name,
+            token=token,
+            members=members
+        )
+
+        if not chat_info:
+            print(f"❌ 第 {attempt} 次创建群失败")
+            last_error = "创建群失败"
+            if attempt < max_retries:
+                wait_time = attempt * 3
+                print(f"   等待 {wait_time} 秒后重试...")
+                time.sleep(wait_time)
+            continue
+
+        # 检查群成员
+        validation = check_and_validate_chat_members(
+            chat_id=chat_info['chat_id'],
+            expected_members=members if members else [],
+            token=token,
+            auto_disband_on_empty=True
+        )
+
+        if validation["valid"]:
+            print(f"✅ 群创建成功且成员验证通过")
+            return chat_info
+
+        # 群创建成功但成员为0，已自动解散
+        if validation["disbanded"]:
+            print(f"⚠️ 第 {attempt} 次创建的群成员为0，已自动解散")
+            last_error = "群成员数量为0"
+
+            if attempt < max_retries:
+                wait_time = attempt * 5  # 递增等待时间
+                print(f"   等待 {wait_time} 秒后重试...")
+                time.sleep(wait_time)
+            continue
+        else:
+            # 群未解散但验证失败（可能是API问题）
+            print(f"⚠️ 群验证失败但未解散，尝试继续流程")
+            return chat_info
+
+    # 所有重试都失败了
+    print(f"\n{'='*60}")
+    print(f"❌ 创建群失败，已重试 {max_retries} 次")
+    print(f"   最后错误: {last_error}")
+    print(f"{'='*60}")
+    return None
 
 def update_requirement_with_chat(requirement_id: str, chat_id: str, chat_name: str,
                                   token: str, app_token: str, table_id: str) -> bool:
@@ -660,12 +821,60 @@ def start_requirement_follow(event: Dict[str, Any]) -> Dict[str, Any]:
     record_id = create_requirement_record(event, token, REQUIREMENT_APP_TOKEN, REQUIREMENT_TABLE_ID)
     if not record_id:
         return {"success": False, "error": "创建需求记录失败"}
-    
-    chat_info = create_research_chat(record_id, content, sender_name, token)
+
+    # 准备初始成员列表（需求方 + Boss）
+    initial_members = []
+    if sender_id:
+        initial_members.append(sender_id)
+    if BOSS_ID:
+        initial_members.append(BOSS_ID)
+
+    # 使用带重试和验证的群创建函数
+    chat_info = create_research_chat_with_retry(
+        record_id, content, sender_name, token,
+        members=initial_members, max_retries=2
+    )
+
     if not chat_info:
-        return {"success": False, "error": "创建调研群失败", "record_id": record_id}
-    
-    update_requirement_with_chat(record_id, chat_info['chat_id'], chat_info['chat_name'], token, REQUIREMENT_APP_TOKEN, REQUIREMENT_TABLE_ID)
+        # 群创建失败，更新需求状态为失败
+        print(f"❌ 创建调研群失败，更新需求记录状态...")
+        update_requirement_with_chat(
+            record_id, "创建失败", "群创建失败（成员为0）",
+            token, REQUIREMENT_APP_TOKEN, REQUIREMENT_TABLE_ID
+        )
+        return {
+            "success": False,
+            "error": "创建调研群失败（多次尝试后成员仍为0，已放弃）",
+            "record_id": record_id
+        }
+
+    # 再次验证群成员（双重保险）
+    validation = check_and_validate_chat_members(
+        chat_id=chat_info['chat_id'],
+        expected_members=initial_members,
+        token=token,
+        auto_disband_on_empty=True
+    )
+
+    if not validation["valid"]:
+        # 群成员仍为0，已经解散
+        if validation["disbanded"]:
+            print(f"❌ 群成员验证失败且已解散，放弃需求跟进")
+            update_requirement_with_chat(
+                record_id, "创建失败", "群成员验证失败",
+                token, REQUIREMENT_APP_TOKEN, REQUIREMENT_TABLE_ID
+            )
+            return {
+                "success": False,
+                "error": "群成员验证失败（成员为0，已解散）",
+                "record_id": record_id
+            }
+
+    # 群验证通过，更新需求记录
+    update_requirement_with_chat(
+        record_id, chat_info['chat_id'], chat_info['chat_name'],
+        token, REQUIREMENT_APP_TOKEN, REQUIREMENT_TABLE_ID
+    )
     
     # 启动独立的 skill 来处理调研群消息
     print(f"\n🤖 启动独立 skill 处理调研群消息...")

@@ -1,0 +1,157 @@
+# 需求/问题识别配置
+# Requirement/Problem Recognition Configuration
+# 更新时间: 2026-03-24
+
+---
+
+## 触发模式配置
+
+triggers:
+  # 需求跟进触发条件
+  requirement_follow:
+    keywords:
+      - "需求"
+      - "新功能"
+      - "项目"
+      - "功能"
+    trigger_phrases:
+      - "跟进这个需求"
+      - "跟进需求"
+      - "记录这个需求"
+    target_table: "Op8WbbFewaq1tasfO8IcQkXmnFf"  # 需求跟进清单
+    workflow: "requirement-follow"
+    actions:
+      - create_research_chat
+      - add_members
+      - start_qa_workflow
+      - generate_prd
+
+  # 问题跟进触发条件
+  problem_follow:
+    keywords:
+      - "问题"
+      - "bug"
+      - "故障"
+      - "异常"
+      - "报错"
+      - "错误"
+    trigger_phrases:
+      - "跟进这个问题"
+      - "跟进问题"
+      - "记录这个问题"
+      - "处理这个问题"
+    target_table: "KNiibDP6KaRwopsPbRucr752ntg"  # 业务反馈问题记录表
+    workflow: "problem-tracking"
+    actions:
+      - record_problem
+      - assign_handler
+      - forward_to_dev_group
+      - set_timeout_reminder
+
+---
+
+## 优先级规则
+
+priority_rules:
+  # 当同时匹配多个关键词时的优先级
+  - keyword: "需求"
+    priority: 1  # 最高优先级
+  - keyword: "问题"
+    priority: 1
+  - keyword: "bug"
+    priority: 2
+  - keyword: "故障"
+    priority: 2
+
+---
+
+## 信息提取配置
+
+extraction:
+  # 从引用消息中提取的字段
+  fields:
+    reporter:
+      source: mentions
+      rule: first_mention
+      description: "被@的人 → 需求人/问题报告人"
+    
+    content:
+      source: message
+      rule: text_or_post_content
+      description: "消息内容 → 需求内容/问题描述"
+    
+    source_chat:
+      source: event
+      field: chat_id
+      description: "来源群 → 群ID"
+    
+    original_message_id:
+      source: event
+      field: message_id
+      description: "原始消息ID → 用于关联和转发"
+    
+    message_time:
+      source: event
+      field: create_time
+      description: "消息原始时间 → 用于记录时间戳"
+
+---
+
+## 模糊匹配处理
+
+ambiguous_handling:
+  # 当无法明确判断时的处理方式
+  no_keyword_match:
+    action: "ask_for_clarification"
+    response: "请明确是【跟进需求】还是【跟进问题】？"
+  
+  both_keywords_present:
+    action: "context_analysis"
+    fallback: "ask_for_clarification"
+    response: "您提到的是需求还是问题？请确认以便我正确处理。"
+
+---
+
+## 示例场景验证
+
+examples:
+  - input: "跟进这个需求"
+    quote_content: "@张三 我们需要做一个抖音小程序客服工单对接飞书的功能"
+    expected_workflow: "requirement-follow"
+    expected_table: "Op8WbbFewaq1tasfO8IcQkXmnFf"
+  
+  - input: "跟进这个问题"
+    quote_content: "@李四 系统报错了，订单无法提交"
+    expected_workflow: "problem-tracking"
+    expected_table: "KNiibDP6KaRwopsPbRucr752ntg"
+  
+  - input: "跟进一下"
+    quote_content: "@王五 这个需要处理一下"
+    expected_workflow: "ask_for_clarification"
+    expected_response: "请明确是【跟进需求】还是【跟进问题】？"
+
+---
+
+## 决策流程
+
+decision_flow:
+  steps:
+    - name: "检查触发条件"
+      condition: "用户引用消息 AND 说'跟进...'"
+      if_false: "忽略，不是跟进指令"
+    
+    - name: "提取关键词"
+      condition: "指令中包含哪些关键词"
+      branches:
+        - condition: "包含'需求'相关词"
+          action: "触发requirement-follow"
+        - condition: "包含'问题'相关词"
+          action: "触发problem-tracking"
+        - condition: "无明确关键词"
+          action: "询问用户确认"
+    
+    - name: "提取信息"
+      action: "从引用消息中提取reporter/content/source_chat等"
+    
+    - name: "执行对应流程"
+      action: "根据确定的流程执行相应操作"

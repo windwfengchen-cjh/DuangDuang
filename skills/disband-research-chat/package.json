@@ -1,0 +1,22 @@
+{
+  "name": "disband-research-chat",
+  "version": "1.0.0",
+  "description": "飞书调研群解散工具 - 支持多种调用方式的安全群管理 skill",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": ["feishu", "lark", "chat", "disband", "research"],
+  "author": "OpenClaw",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  }
+}
