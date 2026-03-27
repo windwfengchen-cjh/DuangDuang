@@ -1,9 +1,11 @@
 ---
 name: prd-document
-alias: prd-doc
-alias: product-requirement-document
+alias: [prd-doc, product-requirement-document]
 description: 用于撰写全面的产品需求文档（PRD），确保团队对功能目标、用户价值、验收标准有清晰共识。专注于"做什么"和"为什么"，而非"怎么做"。
 keywords: [prd, 产品需求, 需求文档, 产品规划, 功能设计, requirement]
+trigger: [写PRD, 创建PRD, 产品需求文档, 需求文档, PRD文档]
+version: "1.1"
+category: documentation
 ---
 
 # 产品需求文档 (PRD) 生成

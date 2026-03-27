@@ -6,8 +6,11 @@
 
 set -e
 
+# 确保日志目录存在
+mkdir -p "$HOME/logs/self-improving-agent"
+
 # 日志文件
-LOG_FILE="/var/log/self_improving.log"
+LOG_FILE="$HOME/logs/self-improving-agent/self_improving.log"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
 # 记录开始
